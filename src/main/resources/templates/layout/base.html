@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title layout:title-pattern="$CONTENT_TITLE - Chamba">Chamba</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"/>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          rel="stylesheet"/>
+    <!-- CSS propio (lo crearemos después) -->
+    <link th:href="@{/css/main.css}" rel="stylesheet"/>
+
+    <layout:fragment name="estilos"/>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+<!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+
+        <!-- Logo / Nombre -->
+        <a class="navbar-brand fw-bold fs-4" th:href="@{/}">
+            <i class="fa-solid fa-briefcase me-2"></i>Chamba
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarMain">
+
+            <!-- Links izquierda -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/trabajos}">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i>Buscar trabajo
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('EMPLEADOR')">
+                    <a class="nav-link" th:href="@{/trabajos/nuevo}">
+                        <i class="fa-solid fa-plus me-1"></i>Publicar trabajo
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" th:href="@{/admin}">
+                        <i class="fa-solid fa-gear me-1"></i>Administración
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Links derecha -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+
+                <!-- Sin sesión -->
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/auth/login}">Iniciar sesión</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="btn btn-light btn-sm ms-2" th:href="@{/auth/registro}">
+                        Registrarse
+                    </a>
+                </li>
+
+                <!-- Con sesión -->
+                <sec:authorize access="isAuthenticated()">
+
+                    <!-- Notificaciones -->
+                    <li class="nav-item me-2">
+                        <a class="nav-link position-relative" th:href="@{/notificaciones}">
+                            <i class="fa-solid fa-bell fa-lg"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle
+                                         badge rounded-pill bg-danger"
+                                  th:if="${notificacionesNoLeidas != null and notificacionesNoLeidas > 0}"
+                                  th:text="${notificacionesNoLeidas}">0</span>
+                        </a>
+                    </li>
+
+                    <!-- Billetera -->
+                    <li class="nav-item me-2">
+                        <a class="nav-link" th:href="@{/billetera}">
+                            <i class="fa-solid fa-wallet me-1"></i>
+                            <span th:if="${billetera != null}"
+                                  th:text="'Q' + ${#numbers.formatDecimal(billetera.saldo, 1, 2)}">
+                                Q0.00
+                            </span>
+                        </a>
+                    </li>
+
+                    <!-- Menú usuario -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                           href="#" data-bs-toggle="dropdown">
+                            <img th:if="${usuarioActual != null and usuarioActual.fotoPerfil != null}"
+                                 th:src="@{/imagenes/perfil/{id}(id=${usuarioActual.id})}"
+                                 class="rounded-circle" width="32" height="32"
+                                 style="object-fit:cover;" alt="Foto"/>
+                            <i th:unless="${usuarioActual != null and usuarioActual.fotoPerfil != null}"
+                               class="fa-solid fa-circle-user fa-lg"></i>
+                            <span sec:authentication="name">usuario</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/dashboard}">
+                                    <i class="fa-solid fa-gauge me-2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   th:if="${usuarioActual != null}"
+                                   th:href="@{/perfil/{id}(id=${usuarioActual.id})}">
+                                    <i class="fa-solid fa-user me-2"></i>Mi perfil
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('EMPLEADOR')">
+                                <a class="dropdown-item" th:href="@{/trabajos/mis-trabajos}">
+                                    <i class="fa-solid fa-briefcase me-2"></i>Mis trabajos
+                                </a>
+                            </li>
+                            <li sec:authorize="hasRole('TRABAJADOR')">
+                                <a class="dropdown-item" th:href="@{/mis-postulaciones}">
+                                    <i class="fa-solid fa-file-lines me-2"></i>Mis postulaciones
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/contratos/mis-contratos}">
+                                    <i class="fa-solid fa-handshake me-2"></i>Mis contratos
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"/></li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/perfil/editar}">
+                                    <i class="fa-solid fa-pen me-2"></i>Editar perfil
+                                </a>
+                            </li>
+                            <li>
+                                <form th:action="@{/auth/logout}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}"/>
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i>
+                                        Cerrar sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </sec:authorize>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══════════════════════ ALERTAS GLOBALES ═══════════════════════ -->
+<div class="container mt-3" th:if="${exito != null or error != null}">
+    <div class="alert alert-success alert-dismissible fade show"
+         th:if="${exito != null}" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show"
+         th:if="${error != null}" role="alert">
+        <i class="fa-solid fa-circle-xmark me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+
+<!-- ═══════════════════════ CONTENIDO ═══════════════════════ -->
+<main class="flex-grow-1">
+    <layout:fragment name="contenido"/>
+</main>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer class="bg-primary text-white mt-auto py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <span class="fw-bold fs-5">
+                    <i class="fa-solid fa-briefcase me-2"></i>Chamba
+                </span>
+                <p class="mb-0 small opacity-75 mt-1">
+                    Conectando talento con oportunidad en Guatemala.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <a th:href="@{/trabajos}" class="text-white text-decoration-none me-3 small">
+                    Buscar trabajo
+                </a>
+                <a th:href="@{/auth/registro}" class="text-white text-decoration-none small">
+                    Registrarse
+                </a>
+                <p class="mb-0 small opacity-50 mt-2">
+                    &copy; 2025 Chamba. Proyecto universitario.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<layout:fragment name="scripts"/>
+</body>
+</html>

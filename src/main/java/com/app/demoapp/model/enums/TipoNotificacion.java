@@ -1,0 +1,13 @@
+package com.app.demoapp.model.enums;
+
+public enum TipoNotificacion {
+    NUEVA_POSTULACION,
+    POSTULACION_ACEPTADA,
+    POSTULACION_RECHAZADA,
+    PAGO_RECIBIDO,
+    CONTRATO_INICIADO,
+    CONTRATO_COMPLETADO,
+    NUEVA_RESENA,
+    NUEVO_MENSAJE,
+    REPORTE_REVISADO
+}

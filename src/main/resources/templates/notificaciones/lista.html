@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Notificaciones</title></head>
+<body>
+<section layout:fragment="contenido">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="mb-4">
+                    <h2 class="fw-bold mb-0">Notificaciones</h2>
+                    <p class="text-muted small mb-0">
+                        Todas tus notificaciones recientes
+                    </p>
+                </div>
+
+                <!-- Sin notificaciones -->
+                <div class="text-center py-5 card border-0 shadow-sm"
+                     th:if="${#lists.isEmpty(notificaciones)}">
+                    <i class="fa-solid fa-bell-slash fa-3x text-muted mb-3 d-block"></i>
+                    <h5 class="text-muted">No tienes notificaciones</h5>
+                    <p class="text-muted small mb-0">
+                        Aquí aparecerán tus alertas y avisos importantes.
+                    </p>
+                </div>
+
+                <!-- Lista -->
+                <div class="card border-0 shadow-sm"
+                     th:unless="${#lists.isEmpty(notificaciones)}">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item py-3 px-4"
+                             th:each="notif : ${notificaciones}"
+                             th:classappend="${!notif.leida} ? 'bg-primary bg-opacity-5' : ''">
+                            <div class="d-flex align-items-start gap-3">
+
+                                <!-- Ícono por tipo -->
+                                <div class="mt-1">
+                                    <span th:switch="${notif.tipo.name()}">
+                                        <i th:case="'NUEVA_POSTULACION'"
+                                           class="fa-solid fa-file-lines text-primary fa-lg"></i>
+                                        <i th:case="'POSTULACION_ACEPTADA'"
+                                           class="fa-solid fa-circle-check text-success fa-lg"></i>
+                                        <i th:case="'POSTULACION_RECHAZADA'"
+                                           class="fa-solid fa-circle-xmark text-danger fa-lg"></i>
+                                        <i th:case="'PAGO_RECIBIDO'"
+                                           class="fa-solid fa-money-bill-wave text-success fa-lg"></i>
+                                        <i th:case="'CONTRATO_INICIADO'"
+                                           class="fa-solid fa-handshake text-primary fa-lg"></i>
+                                        <i th:case="'CONTRATO_COMPLETADO'"
+                                           class="fa-solid fa-flag-checkered text-info fa-lg"></i>
+                                        <i th:case="'NUEVA_RESENA'"
+                                           class="fa-solid fa-star text-warning fa-lg"></i>
+                                        <i th:case="'NUEVO_MENSAJE'"
+                                           class="fa-solid fa-comment text-primary fa-lg"></i>
+                                        <i th:case="*"
+                                           class="fa-solid fa-bell text-muted fa-lg"></i>
+                                    </span>
+                                </div>
+
+                                <!-- Contenido -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <p class="mb-1 fw-semibold small"
+                                           th:text="${notif.mensaje}"></p>
+                                        <span class="badge bg-primary ms-2"
+                                              th:unless="${notif.leida}">Nueva</span>
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-clock me-1"></i>
+                                        <span th:text="${#temporals.format(notif.fecha, 'dd/MM/yyyy HH:mm')}">
+                                        </span>
+                                    </div>
+                                    <div class="mt-1" th:if="${notif.url != null}">
+                                        <a th:href="${notif.url}"
+                                           class="btn btn-outline-primary btn-sm py-0 px-2"
+                                           style="font-size: 0.75rem;">
+                                            Ver <i class="fa-solid fa-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Registro</title></head>
+<body>
+<section layout:fragment="contenido">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="card shadow border-0">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold mb-1 text-center">Crear cuenta</h3>
+                        <p class="text-muted text-center small mb-4">
+                            Completa los datos para registrarte
+                        </p>
+
+                        <form th:action="@{/auth/registro}" method="post"
+                              enctype="multipart/form-data" id="formRegistro">
+                            <input type="hidden" th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}"/>
+
+                            <!-- Tipo de cuenta -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Tipo de cuenta</label>
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="rol"
+                                               id="rolEmpleador" value="EMPLEADOR" required/>
+                                        <label class="btn btn-outline-primary w-100 py-3"
+                                               for="rolEmpleador">
+                                            <i class="fa-solid fa-building-user d-block fa-2x mb-2"></i>
+                                            <span class="fw-semibold">Empleador</span>
+                                            <br/><small class="opacity-75">Publico trabajos</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="rol"
+                                               id="rolTrabajador" value="TRABAJADOR"/>
+                                        <label class="btn btn-outline-success w-100 py-3"
+                                               for="rolTrabajador">
+                                            <i class="fa-solid fa-person-digging d-block fa-2x mb-2"></i>
+                                            <span class="fw-semibold">Trabajador</span>
+                                            <br/><small class="opacity-75">Busco trabajo</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Datos básicos -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nombre</label>
+                                    <input type="text" name="nombre" class="form-control"
+                                           placeholder="Tu nombre" required/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Apellido</label>
+                                    <input type="text" name="apellido" class="form-control"
+                                           placeholder="Tu apellido" required/>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">DPI</label>
+                                    <input type="text" name="dpi" class="form-control"
+                                           placeholder="0000 00000 0000" maxlength="15" required/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Teléfono</label>
+                                    <input type="tel" name="telefono" class="form-control"
+                                           placeholder="5555-5555" maxlength="15" required/>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Correo electrónico
+                                </label>
+                                <input type="email" name="email" class="form-control"
+                                       placeholder="tu@email.com" required/>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Contraseña</label>
+                                    <input type="password" name="password" id="password"
+                                           class="form-control" placeholder="Mínimo 8 caracteres"
+                                           minlength="8" required/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        Confirmar contraseña
+                                    </label>
+                                    <input type="password" name="confirmarPassword"
+                                           id="confirmarPassword" class="form-control"
+                                           placeholder="Repite la contraseña"
+                                           minlength="8" required/>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Descripción <span class="text-muted fw-normal">(opcional)</span>
+                                </label>
+                                <textarea name="descripcion" class="form-control" rows="2"
+                                          placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Foto de perfil <span class="text-muted fw-normal">(opcional)</span>
+                                </label>
+                                <input type="file" name="fotoPerfil" class="form-control"
+                                       accept="image/*"/>
+                            </div>
+
+                            <!-- Campos solo para trabajador -->
+                            <div id="camposTrabajador" style="display:none;">
+                                <hr/>
+                                <h6 class="fw-bold text-success mb-3">
+                                    <i class="fa-solid fa-shield-halved me-2"></i>
+                                    Documentos de verificación
+                                </h6>
+                                <p class="text-muted small mb-3">
+                                    Necesitamos verificar tu identidad para que puedas
+                                    recibir trabajos con mayor confianza.
+                                </p>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        Habilidades
+                                    </label>
+                                    <input type="text" name="habilidades" class="form-control"
+                                           placeholder="Ej: Fontanería, pintura, electricidad..."/>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            DPI — Frente
+                                        </label>
+                                        <input type="file" name="dpiFrente"
+                                               class="form-control" accept="image/*"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            DPI — Reverso
+                                        </label>
+                                        <input type="file" name="dpiReverso"
+                                               class="form-control" accept="image/*"/>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        Selfie de verificación
+                                    </label>
+                                    <input type="file" name="selfie"
+                                           class="form-control" accept="image/*"
+                                           id="inputSelfie"/>
+                                    <div class="form-text">
+                                        Una foto tuya sosteniendo tu DPI.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100 fw-semibold mt-2 py-2">
+                                <i class="fa-solid fa-user-plus me-2"></i>
+                                Crear cuenta
+                            </button>
+                        </form>
+
+                        <hr class="my-3"/>
+                        <p class="text-center mb-0 small">
+                            ¿Ya tienes cuenta?
+                            <a th:href="@{/auth/login}" class="fw-semibold">
+                                Inicia sesión
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<th:block layout:fragment="scripts">
+<script>
+    // Mostrar campos de trabajador según selección
+    const radios = document.querySelectorAll('input[name="rol"]');
+    const camposTrabajador = document.getElementById('camposTrabajador');
+
+    radios.forEach(r => r.addEventListener('change', () => {
+        camposTrabajador.style.display =
+            r.value === 'TRABAJADOR' && r.checked ? 'block' : 'none';
+    }));
+
+    // Validar contraseñas
+    document.getElementById('formRegistro').addEventListener('submit', e => {
+        const p1 = document.getElementById('password').value;
+        const p2 = document.getElementById('confirmarPassword').value;
+        if (p1 !== p2) {
+            e.preventDefault();
+            alert('Las contraseñas no coinciden.');
+        }
+    });
+</script>
+</th:block>
+</body>
+</html>
