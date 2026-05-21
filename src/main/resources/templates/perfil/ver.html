@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${perfil != null} ?
-           ${perfil.nombre} + ' ' + ${perfil.apellido} : 'Perfil'">
-        Perfil
-    </title>
+    <meta charset="UTF-8"/>
+    <title>Perfil - Chamba</title>
 </head>
 <body>
-<section layout:fragment="contenido">
 
-    <h2>Perfil de usuario</h2>
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
 
-    <img th:if="${fotoSrc != null}"
-         th:src="${fotoSrc}"
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
+    <h2>Perfil</h2>
+
+    <img th:if="${fotoSrc != null}" th:src="${fotoSrc}"
          width="100" height="100"
-         style="border-radius:50%; object-fit:cover;"
-         alt="Foto de perfil"/>
+         style="border-radius:50%;object-fit:cover;" alt="Foto"/>
 
     <h3 th:if="${perfil != null}"
         th:text="${perfil.nombre} + ' ' + ${perfil.apellido}"></h3>
@@ -26,17 +29,17 @@
     <p>Email: <span th:text="${usuario.email}"></span></p>
     <p>Rol: <strong th:text="${usuario.rol}"></strong></p>
     <p>Miembro desde:
-        <span th:text="${#temporals.format(usuario.fechaRegistro,'MM/yyyy')}"></span>
+        <span th:text="${#temporals.format(usuario.fechaRegistro,'MM/yyyy')}">
+        </span>
     </p>
 
     <div th:if="${perfil != null}">
         <p th:if="${perfil.telefono != null}"
-           th:text="'Teléfono: ' + ${perfil.telefono}"></p>
+           th:text="'Tel: ' + ${perfil.telefono}"></p>
         <p th:if="${perfil.descripcion != null}"
-           th:text="'Descripción: ' + ${perfil.descripcion}"></p>
+           th:text="${perfil.descripcion}"></p>
     </div>
 
-    <!-- Verificación trabajador -->
     <div th:if="${usuario.rol.name() == 'TRABAJADOR' and perfil != null}">
         <p>Verificación:
             <strong th:text="${perfil.estadoVerificacion}"></strong>
@@ -45,14 +48,15 @@
            th:text="'Habilidades: ' + ${perfil.habilidades}"></p>
     </div>
 
-    <!-- Reputación -->
-    <p>Puntuación promedio:
-        <strong th:text="${#numbers.formatDecimal(promedio,1,1)} + ' / 5'">
-        </strong>
+    <p>Puntuación:
+        <strong th:text="${#numbers.formatDecimal(promedio,1,1)} + '/5'"></strong>
         (<span th:text="${totalResenas}"></span> reseñas)
     </p>
 
-    <!-- Trabajos publicados (empleador) -->
+    <div th:if="${usuarioActual != null and usuarioActual.id == usuario.id}">
+        <p><a th:href="@{/perfil/editar}">Editar mi perfil</a></p>
+    </div>
+
     <div th:if="${usuario.rol.name() == 'EMPLEADOR' and
                  trabajosPublicados != null and
                  not #lists.isEmpty(trabajosPublicados)}">
@@ -63,33 +67,24 @@
                 <a th:href="@{/trabajos/{id}(id=${t.id})}"
                    th:text="${t.titulo}"></a>
                 — <span th:text="${t.estado}"></span>
-                — <span th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}">
-                </span>
             </li>
         </ul>
     </div>
 
-    <!-- Reseñas -->
     <hr/>
     <h3>Reseñas</h3>
-    <p th:if="${#lists.isEmpty(resenas)}">Sin reseñas aún.</p>
+    <p th:if="${#lists.isEmpty(resenas)}">Sin reseñas.</p>
     <div th:each="r : ${resenas}">
         <p>
-            <strong th:text="${r.autor.email}"></strong>
-            — <span th:text="${r.puntuacion} + '/5'"></span>
-            — <span th:text="${#temporals.format(r.fecha,'dd/MM/yyyy')}"></span>
+            <strong th:text="${r.autor.email}"></strong> —
+            <span th:text="${r.puntuacion} + '/5'"></span> —
+            <span th:text="${#temporals.format(r.fecha,'dd/MM/yyyy')}"></span>
         </p>
         <p th:if="${r.comentario != null}" th:text="${r.comentario}"></p>
         <hr/>
     </div>
 
-    <!-- Acciones -->
-    <div th:if="${usuarioActual != null and usuarioActual.id == usuario.id}">
-        <a th:href="@{/perfil/editar}">Editar mi perfil</a>
-    </div>
-
     <div th:if="${usuarioActual != null and usuarioActual.id != usuario.id}">
-        <hr/>
         <h3>Reportar usuario</h3>
         <form th:action="@{/reportes/crear}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}"
@@ -106,16 +101,15 @@
                     <option value="Spam">Spam</option>
                     <option value="Otro">Otro</option>
                 </select>
-            </label>
-            <br/>
-            <label>Descripción (opcional):
+            </label><br/>
+            <label>Descripción:<br/>
                 <textarea name="descripcion" rows="2" cols="40"></textarea>
-            </label>
-            <br/>
-            <button type="submit">Enviar reporte</button>
+            </label><br/>
+            <button type="submit">Reportar</button>
         </form>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

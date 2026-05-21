@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Mi billetera</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Billetera - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h2>Mi billetera</h2>
     <h3>Saldo:
         <strong th:text="'Q' + ${#numbers.formatDecimal(billetera.saldo,1,2)}">
@@ -35,18 +45,13 @@
     </form>
 
     <hr/>
-    <h3>Historial de movimientos</h3>
-
-    <p th:if="${#lists.isEmpty(historial)}">Sin movimientos aún.</p>
-
+    <h3>Historial</h3>
+    <p th:if="${#lists.isEmpty(historial)}">Sin movimientos.</p>
     <table th:unless="${#lists.isEmpty(historial)}" border="1" cellpadding="6">
         <thead>
             <tr>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Monto</th>
-                <th>Estado</th>
-                <th>Fecha</th>
+                <th>Tipo</th><th>Descripción</th>
+                <th>Monto</th><th>Estado</th><th>Fecha</th>
             </tr>
         </thead>
         <tbody>
@@ -59,7 +64,8 @@
             </tr>
         </tbody>
     </table>
+</main>
 
-</section>
+<footer><p>xd &copy; 2026</p></footer>
 </body>
 </html>

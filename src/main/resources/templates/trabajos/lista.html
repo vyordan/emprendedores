@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Buscar trabajo</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Buscar trabajo - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h2>Trabajos disponibles</h2>
 
     <form th:action="@{/trabajos}" method="get">
@@ -15,7 +25,7 @@
         <button type="submit">Buscar</button>
     </form>
 
-    <p>Categorías:
+    <p>
         <a th:href="@{/trabajos}">Todas</a>
         <span th:each="cat : ${categorias}">
             &nbsp;|&nbsp;
@@ -26,10 +36,7 @@
 
     <hr/>
 
-    <p th:if="${#lists.isEmpty(trabajos)}">
-        No se encontraron trabajos.
-        <a th:href="@{/trabajos}">Ver todos</a>
-    </p>
+    <p th:if="${#lists.isEmpty(trabajos)}">No se encontraron trabajos.</p>
 
     <div th:each="trabajo : ${trabajos}">
         <h3 th:text="${trabajo.titulo}"></h3>
@@ -41,14 +48,14 @@
             &nbsp;|&nbsp;
             Estado: <span th:text="${trabajo.estado}"></span>
             &nbsp;|&nbsp;
-            Postulantes: <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
+            Postulantes:
+            <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
         </p>
-        <p th:if="${trabajo.categoria != null}"
-           th:text="'Categoría: ' + ${trabajo.categoria.nombre}"></p>
         <a th:href="@{/trabajos/{id}(id=${trabajo.id})}">Ver detalle</a>
         <hr/>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

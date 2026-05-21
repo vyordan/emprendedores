@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      layout:decorate="~{layout/base}">
-<head><title th:text="${trabajo.titulo}">Detalle</title></head>
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${trabajo.titulo} + ' - Chamba'">Detalle</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
-    <a th:href="@{/trabajos}">← Volver a la lista</a>
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
+    <a th:href="@{/trabajos}">← Volver</a>
 
     <h2 th:text="${trabajo.titulo}"></h2>
     <p>Estado: <strong th:text="${trabajo.estado}"></strong></p>
@@ -21,9 +32,9 @@
     <p th:if="${trabajo.fechaLimite != null}"
        th:text="'Fecha límite: ' + ${#temporals.format(trabajo.fechaLimite,'dd/MM/yyyy')}">
     </p>
-    <p>Postulantes: <span th:text="${#lists.size(trabajo.postulaciones)}"></span></p>
-    <p>Publicado: <span th:text="${#temporals.format(trabajo.fechaCreacion,'dd/MM/yyyy')}">
-    </span></p>
+    <p>Postulantes:
+        <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
+    </p>
 
     <h3>Descripción</h3>
     <p style="white-space:pre-line;" th:text="${trabajo.descripcion}"></p>
@@ -34,11 +45,9 @@
            th:text="${trabajo.empleador.email}"></a>
     </p>
 
-    <hr/>
-
-    <!-- Dueño del trabajo -->
-    <div th:if="${usuarioActual != null and trabajo.empleador.id == usuarioActual.id}">
-        <h3>Administrar</h3>
+    <div th:if="${usuarioActual != null and
+                 trabajo.empleador.id == usuarioActual.id}">
+        <hr/>
         <a th:href="@{/trabajos/editar/{id}(id=${trabajo.id})}">Editar</a>
         &nbsp;
         <a th:href="@{/trabajos/{id}/postulaciones(id=${trabajo.id})}">
@@ -57,24 +66,20 @@
         </form>
     </div>
 
-    <!-- Postularse (trabajador) -->
     <div sec:authorize="hasRole('TRABAJADOR')">
         <hr/>
         <h3>Postularme</h3>
-
         <p th:if="${yaPostulado}" style="color:green;">
             Ya te postulaste a este trabajo.
         </p>
-
         <form th:unless="${yaPostulado}"
               th:action="@{/trabajos/{id}/postular(id=${trabajo.id})}"
               method="post">
             <input type="hidden" th:name="${_csrf.parameterName}"
                    th:value="${_csrf.token}"/>
             <p>
-                <label>Mensaje de presentación:<br/>
+                <label>Mensaje:<br/>
                     <textarea name="mensaje" rows="4" cols="50"
-                              placeholder="¿Por qué eres ideal para este trabajo?"
                               required></textarea>
                 </label>
             </p>
@@ -82,14 +87,12 @@
         </form>
     </div>
 
-    <!-- Sin sesión -->
     <div sec:authorize="isAnonymous()">
         <hr/>
-        <p>
-            <a th:href="@{/auth/login}">Inicia sesión</a> para postularte.
-        </p>
+        <p><a th:href="@{/auth/login}">Inicia sesión</a> para postularte.</p>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

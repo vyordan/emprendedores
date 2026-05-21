@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>No encontrado</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>404 - Chamba</title></head>
 <body>
-<section layout:fragment="contenido">
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+<main>
     <h2>404 — Página no encontrada</h2>
     <p>La página que buscas no existe.</p>
     <a th:href="@{/}">Volver al inicio</a>
-</section>
+</main>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

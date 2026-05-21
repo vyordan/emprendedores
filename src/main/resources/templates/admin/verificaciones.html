@@ -1,22 +1,29 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Admin — Verificaciones</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Verificaciones - Admin</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <a th:href="@{/admin}">← Admin</a>
     <h2>Verificaciones pendientes</h2>
-
-    <p th:if="${#lists.isEmpty(pendientes)}">
-        No hay verificaciones pendientes.
-    </p>
+    <p th:if="${#lists.isEmpty(pendientes)}">Sin pendientes.</p>
 
     <div th:each="perfil : ${pendientes}">
         <h3 th:text="${perfil.nombre} + ' ' + ${perfil.apellido}"></h3>
-        <p>Email: <span th:text="${perfil.usuario.email}"></span></p>
+        <p th:text="${perfil.usuario.email}"></p>
         <p>DPI: <span th:text="${perfil.dpi}"></span></p>
 
         <p th:if="${perfil.dpiFrente != null}">
@@ -48,14 +55,13 @@
                    th:value="${_csrf.token}"/>
             <input type="hidden" name="decision" value="RECHAZADO"/>
             <button type="submit"
-                    onclick="return confirm('¿Rechazar verificación?')">
-                Rechazar
-            </button>
+                    onclick="return confirm('¿Rechazar?')">Rechazar</button>
         </form>
         <a th:href="@{/perfil/{id}(id=${perfil.usuario.id})}">Ver perfil</a>
         <hr/>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

@@ -1,30 +1,29 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Notificaciones</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Notificaciones - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<main>
     <h2>Notificaciones</h2>
-
-    <p th:if="${#lists.isEmpty(notificaciones)}">
-        No tienes notificaciones.
-    </p>
-
+    <p th:if="${#lists.isEmpty(notificaciones)}">Sin notificaciones.</p>
     <div th:each="n : ${notificaciones}">
-        <p th:classappend="${!n.leida} ? 'style=font-weight:bold;' : ''">
+        <p>
             <span th:if="${!n.leida}">🔵 </span>
-            <span th:text="${n.mensaje}"></span>
-            &nbsp;—&nbsp;
-            <small th:text="${#temporals.format(n.fecha,'dd/MM/yyyy HH:mm')}"></small>
-            &nbsp;
+            <span th:text="${n.mensaje}"></span> —
+            <small th:text="${#temporals.format(n.fecha,'dd/MM/yyyy HH:mm')}">
+            </small>
             <a th:if="${n.url != null}" th:href="${n.url}">Ver</a>
         </p>
         <hr/>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

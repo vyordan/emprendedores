@@ -1,35 +1,36 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Admin — Reportes</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Reportes - Admin</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <a th:href="@{/admin}">← Admin</a>
-    <h2>Reportes (<span th:text="${#lists.size(reportes)}"></span>)</h2>
-
-    <p th:if="${#lists.isEmpty(reportes)}">No hay reportes.</p>
+    <h2>Reportes</h2>
+    <p th:if="${#lists.isEmpty(reportes)}">Sin reportes.</p>
 
     <table th:unless="${#lists.isEmpty(reportes)}" border="1" cellpadding="6">
-        <thead>
-            <tr>
-                <th>Reportante</th>
-                <th>Reportado</th>
-                <th>Motivo</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
+        <thead><tr>
+            <th>Reportante</th><th>Reportado</th>
+            <th>Motivo</th><th>Estado</th><th>Fecha</th><th>Acciones</th>
+        </tr></thead>
         <tbody>
             <tr th:each="r : ${reportes}">
                 <td th:text="${r.reportante.email}"></td>
-                <td>
-                    <a th:href="@{/perfil/{id}(id=${r.reportado.id})}"
-                       th:text="${r.reportado.email}"></a>
-                </td>
+                <td><a th:href="@{/perfil/{id}(id=${r.reportado.id})}"
+                       th:text="${r.reportado.email}"></a></td>
                 <td th:text="${r.motivo}"></td>
                 <td th:text="${r.estado}"></td>
                 <td th:text="${#temporals.format(r.fecha,'dd/MM/yyyy')}"></td>
@@ -54,7 +55,8 @@
             </tr>
         </tbody>
     </table>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

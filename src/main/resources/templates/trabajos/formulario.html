@@ -1,16 +1,24 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${trabajo != null} ? 'Editar trabajo' : 'Publicar trabajo'">
+    <meta charset="UTF-8"/>
+    <title th:text="${trabajo != null} ? 'Editar - Chamba' : 'Publicar - Chamba'">
         Trabajo
     </title>
 </head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h2 th:text="${trabajo != null} ? 'Editar trabajo' : 'Publicar trabajo'"></h2>
 
     <form th:action="${trabajo != null}
@@ -20,50 +28,41 @@
         <input type="hidden" th:name="${_csrf.parameterName}"
                th:value="${_csrf.token}"/>
 
-        <p>
-            <label>Título:<br/>
-                <input type="text" name="titulo" size="50"
-                       th:value="${trabajo?.titulo}" required maxlength="200"/>
-            </label>
-        </p>
-        <p>
-            <label>Descripción:<br/>
-                <textarea name="descripcion" rows="6" cols="50"
-                          required th:text="${trabajo?.descripcion}"></textarea>
-            </label>
-        </p>
-        <p>
-            <label>Presupuesto (Q):<br/>
-                <input type="number" name="presupuesto" step="0.01" min="1"
-                       th:value="${trabajo?.presupuesto}" required/>
-            </label>
-        </p>
-        <p>
-            <label>Fecha límite (opcional):<br/>
-                <input type="date" name="fechaLimite"
-                       th:value="${trabajo?.fechaLimite}"/>
-            </label>
-        </p>
-        <p>
-            <label>Categoría:<br/>
-                <select name="categoriaId">
-                    <option value="">Sin categoría</option>
-                    <option th:each="cat : ${categorias}"
-                            th:value="${cat.id}"
-                            th:text="${cat.nombre}"
-                            th:selected="${trabajo?.categoria?.id == cat.id}">
-                    </option>
-                </select>
-            </label>
-        </p>
+        <p><label>Título:<br/>
+            <input type="text" name="titulo" size="50"
+                   th:value="${trabajo?.titulo}" required maxlength="200"/>
+        </label></p>
+        <p><label>Descripción:<br/>
+            <textarea name="descripcion" rows="6" cols="50"
+                      required th:text="${trabajo?.descripcion}"></textarea>
+        </label></p>
+        <p><label>Presupuesto (Q):<br/>
+            <input type="number" name="presupuesto" step="0.01" min="1"
+                   th:value="${trabajo?.presupuesto}" required/>
+        </label></p>
+        <p><label>Fecha límite (opcional):<br/>
+            <input type="date" name="fechaLimite"
+                   th:value="${trabajo?.fechaLimite}"/>
+        </label></p>
+        <p><label>Categoría:<br/>
+            <select name="categoriaId">
+                <option value="">Sin categoría</option>
+                <option th:each="cat : ${categorias}"
+                        th:value="${cat.id}"
+                        th:text="${cat.nombre}"
+                        th:selected="${trabajo?.categoria?.id == cat.id}">
+                </option>
+            </select>
+        </label></p>
 
         <button type="submit"
-                th:text="${trabajo != null} ? 'Guardar cambios' : 'Publicar trabajo'">
+                th:text="${trabajo != null} ? 'Guardar cambios' : 'Publicar'">
         </button>
         &nbsp;
         <a th:href="@{/trabajos/mis-trabajos}">Cancelar</a>
     </form>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

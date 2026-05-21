@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Inicio</title></head>
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Inicio - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h1>Encuentra trabajo hoy</h1>
     <p>La plataforma que conecta a guatemaltecos con oportunidades reales.</p>
 
@@ -16,7 +29,6 @@
     </form>
 
     <hr/>
-
     <h2>Categorías</h2>
     <ul>
         <li th:each="cat : ${categorias}">
@@ -26,13 +38,10 @@
     </ul>
 
     <hr/>
-
     <h2>Trabajos disponibles</h2>
-
     <p th:if="${#lists.isEmpty(trabajos)}">
         No hay trabajos disponibles por el momento.
     </p>
-
     <div th:each="trabajo, iter : ${trabajos}" th:if="${iter.index < 6}">
         <h3 th:text="${trabajo.titulo}"></h3>
         <p th:text="${#strings.abbreviate(trabajo.descripcion, 150)}"></p>
@@ -40,12 +49,11 @@
             <strong th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto,1,2)}">
             </strong>
         </p>
-        <p th:if="${trabajo.categoria != null}"
-           th:text="'Categoría: ' + ${trabajo.categoria.nombre}"></p>
         <a th:href="@{/trabajos/{id}(id=${trabajo.id})}">Ver detalle</a>
         <hr/>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

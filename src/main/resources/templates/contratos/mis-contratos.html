@@ -1,17 +1,24 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Mis contratos</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Mis contratos - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h2>Mis contratos</h2>
-
-    <p th:if="${#lists.isEmpty(contratos)}">
-        Aún no tienes contratos.
-    </p>
+    <p th:if="${#lists.isEmpty(contratos)}">Sin contratos aún.</p>
 
     <div th:each="c : ${contratos}">
         <h3 th:text="'Contrato #' + ${c.id}"></h3>
@@ -25,25 +32,14 @@
             </span>
         </p>
         <p>
-            Empleador:
-            <a th:href="@{/perfil/{id}(id=${c.postulacion.trabajo.empleador.id})}"
-               th:text="${c.postulacion.trabajo.empleador.email}"></a>
-            &nbsp;|&nbsp;
-            Trabajador:
-            <a th:href="@{/perfil/{id}(id=${c.postulacion.trabajador.id})}"
-               th:text="${c.postulacion.trabajador.email}"></a>
-        </p>
-        <p>
             Inicio:
             <span th:text="${#temporals.format(c.fechaInicio,'dd/MM/yyyy')}"></span>
-            <span th:if="${c.fechaFinEstimada != null}"
-                  th:text="'| Estimado: ' + ${#temporals.format(c.fechaFinEstimada,'dd/MM/yyyy')}">
-            </span>
         </p>
         <a th:href="@{/contratos/{id}(id=${c.id})}">Ver detalle</a>
         <hr/>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

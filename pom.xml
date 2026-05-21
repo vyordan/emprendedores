@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.14</version>
+        <version>3.4.3</version>
         <relativePath/>
     </parent>
 
@@ -36,10 +36,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>nz.net.ultraq.thymeleaf</groupId>
             <artifactId>thymeleaf-layout-dialect</artifactId>
-        </dependency>
+            <version>3.2.1</version>
+        </dependency>           ESTA DEPENDENCIA ERA PARA LA COMUNICACION CON LAYOUT DIALECT-->
 
         <!-- Thymeleaf + Spring Security extras (th:sec) -->
         <dependency>

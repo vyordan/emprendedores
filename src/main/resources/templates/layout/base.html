@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title layout:title-pattern="$CONTENT_TITLE - Chamba">Chamba</title>
+    <title th:text="${paginaTitulo != null} ? ${paginaTitulo} + ' - Chamba' : 'Chamba'">
+        Chamba
+    </title>
 </head>
 <body>
 
-<nav>
+<nav th:fragment="navbar">
     <a th:href="@{/}">Chamba</a>
     &nbsp;|&nbsp;
     <a th:href="@{/trabajos}">Buscar trabajo</a>
@@ -64,24 +65,6 @@
         </form>
     </span>
 </nav>
-
-<hr/>
-
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
-
-<main>
-    <layout:fragment name="contenido"/>
-</main>
-
-<hr/>
-<footer>
-    <p>Chamba &copy; 2025 — Proyecto universitario</p>
-</footer>
 
 </body>
 </html>

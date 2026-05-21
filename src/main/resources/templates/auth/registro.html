@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Registro</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Registro - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h2>Crear cuenta</h2>
 
     <form th:action="@{/auth/registro}" method="post"
@@ -26,79 +36,39 @@
                 Trabajador (busco trabajo)
             </label>
         </p>
-
-        <p>
-            <label>Nombre:<br/>
-                <input type="text" name="nombre" required/>
-            </label>
-        </p>
-        <p>
-            <label>Apellido:<br/>
-                <input type="text" name="apellido" required/>
-            </label>
-        </p>
-        <p>
-            <label>DPI:<br/>
-                <input type="text" name="dpi" maxlength="15" required/>
-            </label>
-        </p>
-        <p>
-            <label>Teléfono:<br/>
-                <input type="tel" name="telefono" maxlength="15" required/>
-            </label>
-        </p>
-        <p>
-            <label>Email:<br/>
-                <input type="email" name="email" required/>
-            </label>
-        </p>
-        <p>
-            <label>Contraseña:<br/>
-                <input type="password" name="password" id="password"
-                       minlength="8" required/>
-            </label>
-        </p>
-        <p>
-            <label>Confirmar contraseña:<br/>
-                <input type="password" name="confirmarPassword"
-                       id="confirmarPassword" minlength="8" required/>
-            </label>
-        </p>
-        <p>
-            <label>Descripción (opcional):<br/>
-                <textarea name="descripcion" rows="3"></textarea>
-            </label>
-        </p>
-        <p>
-            <label>Foto de perfil (opcional):<br/>
-                <input type="file" name="fotoPerfil" accept="image/*"/>
-            </label>
-        </p>
+        <p><label>Nombre:<br/>
+            <input type="text" name="nombre" required/></label></p>
+        <p><label>Apellido:<br/>
+            <input type="text" name="apellido" required/></label></p>
+        <p><label>DPI:<br/>
+            <input type="text" name="dpi" maxlength="15" required/></label></p>
+        <p><label>Teléfono:<br/>
+            <input type="tel" name="telefono" maxlength="15" required/></label></p>
+        <p><label>Email:<br/>
+            <input type="email" name="email" required/></label></p>
+        <p><label>Contraseña:<br/>
+            <input type="password" name="password"
+                   id="password" minlength="8" required/></label></p>
+        <p><label>Confirmar contraseña:<br/>
+            <input type="password" name="confirmarPassword"
+                   id="confirmarPassword" minlength="8" required/></label></p>
+        <p><label>Descripción (opcional):<br/>
+            <textarea name="descripcion" rows="3"></textarea></label></p>
+        <p><label>Foto de perfil (opcional):<br/>
+            <input type="file" name="fotoPerfil" accept="image/*"/></label></p>
 
         <div id="camposTrabajador" style="display:none;">
             <hr/>
-            <h3>Documentos de verificación (trabajador)</h3>
-            <p>
-                <label>Habilidades:<br/>
-                    <input type="text" name="habilidades"
-                           placeholder="Ej: Fontanería, pintura..."/>
-                </label>
-            </p>
-            <p>
-                <label>DPI — Frente:<br/>
-                    <input type="file" name="dpiFrente" accept="image/*"/>
-                </label>
-            </p>
-            <p>
-                <label>DPI — Reverso:<br/>
-                    <input type="file" name="dpiReverso" accept="image/*"/>
-                </label>
-            </p>
-            <p>
-                <label>Selfie de verificación:<br/>
-                    <input type="file" name="selfie" accept="image/*"/>
-                </label>
-            </p>
+            <h3>Documentos de verificación</h3>
+            <p><label>Habilidades:<br/>
+                <input type="text" name="habilidades"
+                       placeholder="Ej: Fontanería, pintura..."/></label></p>
+            <p><label>DPI — Frente:<br/>
+                <input type="file" name="dpiFrente" accept="image/*"/></label></p>
+            <p><label>DPI — Reverso:<br/>
+                <input type="file" name="dpiReverso" accept="image/*"/></label></p>
+            <p><label>Selfie de verificación:<br/>
+                <input type="file" name="selfie" accept="image/*"/></label></p>
         </div>
 
         <button type="submit">Crear cuenta</button>
@@ -107,10 +77,10 @@
     <p>¿Ya tienes cuenta?
         <a th:href="@{/auth/login}">Inicia sesión</a>
     </p>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 
-<th:block layout:fragment="scripts">
 <script>
     document.querySelectorAll('input[name="rol"]').forEach(r => {
         r.addEventListener('change', () => {
@@ -118,7 +88,6 @@
                 r.value === 'TRABAJADOR' && r.checked ? 'block' : 'none';
         });
     });
-
     document.getElementById('formRegistro').addEventListener('submit', e => {
         const p1 = document.getElementById('password').value;
         const p2 = document.getElementById('confirmarPassword').value;
@@ -128,6 +97,5 @@
         }
     });
 </script>
-</th:block>
 </body>
 </html>

@@ -1,56 +1,57 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Postulantes</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Postulantes - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
-    <a th:href="@{/trabajos/{id}(id=${trabajo.id})}">← Volver al trabajo</a>
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
 
-    <h2>Postulantes para: <span th:text="${trabajo.titulo}"></span></h2>
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
+    <a th:href="@{/trabajos/{id}(id=${trabajo.id})}">← Volver</a>
+    <h2>Postulantes: <span th:text="${trabajo.titulo}"></span></h2>
     <p><span th:text="${#lists.size(postulaciones)}"></span> postulante(s)</p>
 
-    <p th:if="${#lists.isEmpty(postulaciones)}">
-        Nadie se ha postulado aún.
-    </p>
+    <p th:if="${#lists.isEmpty(postulaciones)}">Nadie se ha postulado aún.</p>
 
     <div th:each="p : ${postulaciones}">
         <h3 th:text="${p.trabajador.email}"></h3>
         <p>
-            Estado: <strong th:text="${p.estado}"></strong>
-            &nbsp;|&nbsp;
+            Estado: <strong th:text="${p.estado}"></strong> &nbsp;|&nbsp;
             Fecha:
-            <span th:text="${#temporals.format(p.fechaPostulacion,'dd/MM/yyyy HH:mm')}">
+            <span th:text="${#temporals.format(p.fechaPostulacion,'dd/MM/yyyy')}">
             </span>
         </p>
         <p th:if="${p.mensajePresentacion != null}"
            th:text="'Mensaje: ' + ${p.mensajePresentacion}"></p>
-        <p>
-            <a th:href="@{/perfil/{id}(id=${p.trabajador.id})}">Ver perfil</a>
-        </p>
+        <p><a th:href="@{/perfil/{id}(id=${p.trabajador.id})}">Ver perfil</a></p>
 
-        <!-- Acciones si está pendiente -->
         <div th:if="${p.estado.name() == 'PENDIENTE'}">
-
-            <!-- Formulario aceptar -->
             <form th:action="@{/contratos/aceptar/{id}(id=${p.id})}"
                   method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}"
                        th:value="${_csrf.token}"/>
-                <label>Monto acordado (Q):
+                <label>Monto (Q):
                     <input type="number" name="montoAcordado" step="0.01"
                            th:value="${trabajo.presupuesto}" required/>
                 </label>
                 &nbsp;
-                <label>Fecha fin estimada:
+                <label>Fecha fin:
                     <input type="date" name="fechaFinEstimada"/>
                 </label>
                 &nbsp;
                 <button type="submit"
                         onclick="return confirm('¿Aceptar y crear contrato?')">
-                    Aceptar y crear contrato
+                    Aceptar
                 </button>
             </form>
 
@@ -59,20 +60,17 @@
                 <input type="hidden" th:name="${_csrf.parameterName}"
                        th:value="${_csrf.token}"/>
                 <button type="submit"
-                        onclick="return confirm('¿Rechazar esta postulación?')">
-                    Rechazar
-                </button>
+                        onclick="return confirm('¿Rechazar?')">Rechazar</button>
             </form>
         </div>
 
-        <!-- Si ya fue aceptado -->
         <div th:if="${p.estado.name() == 'ACEPTADA' and p.contrato != null}">
             <a th:href="@{/contratos/{id}(id=${p.contrato.id})}">Ver contrato</a>
         </div>
-
         <hr/>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

@@ -1,28 +1,37 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Admin</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Admin - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h2>Panel de administración</h2>
-
-    <p>Usuarios registrados: <strong th:text="${totalUsuarios}"></strong></p>
+    <p>Usuarios: <strong th:text="${totalUsuarios}"></strong></p>
     <p>Trabajos abiertos: <strong th:text="${totalTrabajos}"></strong></p>
     <p>Reportes pendientes: <strong th:text="${reportesPendientes}"></strong></p>
     <p>Verificaciones pendientes:
         <strong th:text="${verificacionesPendientes}"></strong>
     </p>
-
     <ul>
         <li><a th:href="@{/admin/usuarios}">Gestionar usuarios</a></li>
-        <li><a th:href="@{/admin/verificaciones}">Revisar verificaciones</a></li>
-        <li><a th:href="@{/admin/reportes}">Revisar reportes</a></li>
-        <li><a th:href="@{/admin/trabajos}">Ver trabajos</a></li>
+        <li><a th:href="@{/admin/verificaciones}">Verificaciones</a></li>
+        <li><a th:href="@{/admin/reportes}">Reportes</a></li>
+        <li><a th:href="@{/admin/trabajos}">Trabajos</a></li>
     </ul>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

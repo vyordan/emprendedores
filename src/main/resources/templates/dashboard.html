@@ -1,14 +1,23 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Dashboard</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Dashboard - Chamba</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<div th:if="${exito != null}">
+    <p style="color:green;" th:text="${exito}"></p>
+</div>
+<div th:if="${error != null}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<main>
     <h2>Dashboard</h2>
-
     <p>Bienvenido,
         <strong>
             <span th:if="${usuarioActual.perfilEmpleador != null}"
@@ -22,24 +31,15 @@
         — Rol: <span th:text="${usuarioActual.rol}"></span>
     </p>
 
-    <!-- EMPLEADOR -->
     <div th:if="${usuarioActual.rol.name() == 'EMPLEADOR'}">
-        <h3>Mis trabajos publicados</h3>
+        <h3>Mis trabajos</h3>
         <p><a th:href="@{/trabajos/nuevo}">+ Publicar nuevo trabajo</a></p>
-
-        <p th:if="${#lists.isEmpty(misTrabajos)}">
-            Aún no has publicado trabajos.
-        </p>
+        <p th:if="${#lists.isEmpty(misTrabajos)}">Sin trabajos publicados.</p>
         <table th:unless="${#lists.isEmpty(misTrabajos)}" border="1" cellpadding="6">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Estado</th>
-                    <th>Presupuesto</th>
-                    <th>Postulantes</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
+            <thead><tr>
+                <th>Título</th><th>Estado</th>
+                <th>Presupuesto</th><th>Postulantes</th><th>Acciones</th>
+            </tr></thead>
             <tbody>
                 <tr th:each="t : ${misTrabajos}">
                     <td th:text="${t.titulo}"></td>
@@ -62,38 +62,30 @@
         <ul th:unless="${#lists.isEmpty(misContratos)}">
             <li th:each="c : ${misContratos}">
                 <a th:href="@{/contratos/{id}(id=${c.id})}"
-                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}">
-                </a>
+                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}"></a>
             </li>
         </ul>
     </div>
 
-    <!-- TRABAJADOR -->
     <div th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
         <h3>Mis postulaciones</h3>
         <p><a th:href="@{/trabajos}">Buscar trabajos</a></p>
-
-        <p th:if="${#lists.isEmpty(misPostulaciones)}">
-            Aún no te has postulado a ningún trabajo.
-        </p>
+        <p th:if="${#lists.isEmpty(misPostulaciones)}">Sin postulaciones aún.</p>
         <table th:unless="${#lists.isEmpty(misPostulaciones)}"
                border="1" cellpadding="6">
-            <thead>
-                <tr>
-                    <th>Trabajo</th>
-                    <th>Presupuesto</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
+            <thead><tr>
+                <th>Trabajo</th><th>Presupuesto</th>
+                <th>Estado</th><th>Acciones</th>
+            </tr></thead>
             <tbody>
                 <tr th:each="p : ${misPostulaciones}">
                     <td th:text="${p.trabajo.titulo}"></td>
-                    <td th:text="'Q' + ${#numbers.formatDecimal(p.trabajo.presupuesto,1,2)}">
-                    </td>
+                    <td th:text="'Q' + ${#numbers.formatDecimal(p.trabajo.presupuesto,1,2)}"></td>
                     <td th:text="${p.estado}"></td>
                     <td>
-                        <a th:href="@{/trabajos/{id}(id=${p.trabajo.id})}">Ver trabajo</a>
+                        <a th:href="@{/trabajos/{id}(id=${p.trabajo.id})}">
+                            Ver trabajo
+                        </a>
                     </td>
                 </tr>
             </tbody>
@@ -104,17 +96,16 @@
         <ul th:unless="${#lists.isEmpty(misContratos)}">
             <li th:each="c : ${misContratos}">
                 <a th:href="@{/contratos/{id}(id=${c.id})}"
-                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}">
-                </a>
+                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}"></a>
             </li>
         </ul>
     </div>
 
-    <!-- ADMIN -->
     <div th:if="${usuarioActual.rol.name() == 'ADMIN'}">
         <p><a th:href="@{/admin}">Ir al panel de administración</a></p>
     </div>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

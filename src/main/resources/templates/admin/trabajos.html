@@ -1,45 +1,38 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head><title>Admin — Trabajos</title></head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Trabajos - Admin</title>
+</head>
 <body>
-<section layout:fragment="contenido">
 
+<div th:replace="~{layout/base :: navbar}"></div>
+<hr/>
+
+<main>
     <a th:href="@{/admin}">← Admin</a>
-    <h2>Trabajos abiertos (<span th:text="${#lists.size(trabajos)}"></span>)</h2>
+    <h2>Trabajos abiertos</h2>
 
     <table border="1" cellpadding="6">
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Empleador</th>
-                <th>Categoría</th>
-                <th>Presupuesto</th>
-                <th>Postulantes</th>
-                <th>Fecha</th>
-                <th>Ver</th>
-            </tr>
-        </thead>
+        <thead><tr>
+            <th>Título</th><th>Empleador</th><th>Categoría</th>
+            <th>Presupuesto</th><th>Postulantes</th><th>Fecha</th><th>Ver</th>
+        </tr></thead>
         <tbody>
             <tr th:each="t : ${trabajos}">
                 <td th:text="${t.titulo}"></td>
-                <td>
-                    <a th:href="@{/perfil/{id}(id=${t.empleador.id})}"
-                       th:text="${t.empleador.email}"></a>
-                </td>
+                <td><a th:href="@{/perfil/{id}(id=${t.empleador.id})}"
+                       th:text="${t.empleador.email}"></a></td>
                 <td th:text="${t.categoria?.nombre}"></td>
                 <td th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}"></td>
                 <td th:text="${#lists.size(t.postulaciones)}"></td>
                 <td th:text="${#temporals.format(t.fechaCreacion,'dd/MM/yyyy')}"></td>
-                <td>
-                    <a th:href="@{/trabajos/{id}(id=${t.id})}">Ver</a>
-                </td>
+                <td><a th:href="@{/trabajos/{id}(id=${t.id})}">Ver</a></td>
             </tr>
         </tbody>
     </table>
+</main>
 
-</section>
+<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>
