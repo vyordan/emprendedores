@@ -6,318 +6,115 @@
 <head><title>Dashboard</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
 
-        <!-- Saludo -->
-        <div class="mb-4">
-            <h2 class="fw-bold mb-1">
-                Hola,
-                <span th:if="${usuarioActual.perfilEmpleador != null}"
-                      th:text="${usuarioActual.perfilEmpleador.nombre}"></span>
-                <span th:if="${usuarioActual.perfilTrabajador != null}"
-                      th:text="${usuarioActual.perfilTrabajador.nombre}"></span>
-                <span th:if="${usuarioActual.perfilEmpleador == null and
-                               usuarioActual.perfilTrabajador == null}"
-                      th:text="${usuarioActual.email}"></span>
-                👋
-            </h2>
-            <p class="text-muted mb-0">
-                <span class="badge"
-                      th:classappend="${usuarioActual.rol.name() == 'EMPLEADOR'} ? 'bg-primary' :
-                                      (${usuarioActual.rol.name() == 'TRABAJADOR'} ? 'bg-success' : 'bg-dark')"
-                      th:text="${usuarioActual.rol}">
-                </span>
-            </p>
-        </div>
+    <h2>Dashboard</h2>
 
-        <!-- ═══════ DASHBOARD EMPLEADOR ═══════ -->
-        <div th:if="${usuarioActual.rol.name() == 'EMPLEADOR'}">
+    <p>Bienvenido,
+        <strong>
+            <span th:if="${usuarioActual.perfilEmpleador != null}"
+                  th:text="${usuarioActual.perfilEmpleador.nombre}"></span>
+            <span th:if="${usuarioActual.perfilTrabajador != null}"
+                  th:text="${usuarioActual.perfilTrabajador.nombre}"></span>
+            <span th:if="${usuarioActual.perfilEmpleador == null and
+                           usuarioActual.perfilTrabajador == null}"
+                  th:text="${usuarioActual.email}"></span>
+        </strong>
+        — Rol: <span th:text="${usuarioActual.rol}"></span>
+    </p>
 
-            <!-- Stats -->
-            <div class="row g-3 mb-4">
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-briefcase fa-2x text-primary mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="${#lists.size(misTrabajos)}">0</div>
-                        <div class="text-muted small">Trabajos publicados</div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-file-contract fa-2x text-success mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="${#lists.size(misContratos)}">0</div>
-                        <div class="text-muted small">Contratos activos</div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-wallet fa-2x text-warning mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="'Q' + ${billetera != null ? #numbers.formatDecimal(billetera.saldo, 1, 2) : '0.00'}">
-                        </div>
-                        <div class="text-muted small">Saldo disponible</div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-bell fa-2x text-danger mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="${notificacionesNoLeidas}">0</div>
-                        <div class="text-muted small">Notificaciones nuevas</div>
-                    </div>
-                </div>
-            </div>
+    <!-- EMPLEADOR -->
+    <div th:if="${usuarioActual.rol.name() == 'EMPLEADOR'}">
+        <h3>Mis trabajos publicados</h3>
+        <p><a th:href="@{/trabajos/nuevo}">+ Publicar nuevo trabajo</a></p>
 
-            <!-- Acciones rápidas -->
-            <div class="row g-3 mb-4">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <h6 class="fw-bold mb-3">Acciones rápidas</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                <a th:href="@{/trabajos/nuevo}"
-                                   class="btn btn-primary">
-                                    <i class="fa-solid fa-plus me-2"></i>
-                                    Publicar trabajo
-                                </a>
-                                <a th:href="@{/trabajos/mis-trabajos}"
-                                   class="btn btn-outline-primary">
-                                    <i class="fa-solid fa-briefcase me-2"></i>
-                                    Mis trabajos
-                                </a>
-                                <a th:href="@{/contratos/mis-contratos}"
-                                   class="btn btn-outline-secondary">
-                                    <i class="fa-solid fa-handshake me-2"></i>
-                                    Mis contratos
-                                </a>
-                                <a th:href="@{/billetera}"
-                                   class="btn btn-outline-warning">
-                                    <i class="fa-solid fa-wallet me-2"></i>
-                                    Billetera
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Últimos trabajos -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 pt-3 fw-bold
-                            d-flex justify-content-between">
-                    <span>
-                        <i class="fa-solid fa-briefcase me-2 text-primary"></i>
-                        Mis últimos trabajos
-                    </span>
-                    <a th:href="@{/trabajos/mis-trabajos}"
-                       class="btn btn-outline-primary btn-sm">Ver todos</a>
-                </div>
-
-                <div class="card-body text-center py-4"
-                     th:if="${#lists.isEmpty(misTrabajos)}">
-                    <p class="text-muted mb-2">Aún no has publicado trabajos.</p>
-                    <a th:href="@{/trabajos/nuevo}" class="btn btn-primary btn-sm">
-                        Publicar ahora
-                    </a>
-                </div>
-
-                <div class="table-responsive"
-                     th:unless="${#lists.isEmpty(misTrabajos)}">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Trabajo</th>
-                                <th>Estado</th>
-                                <th>Postulantes</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="trabajo, iter : ${misTrabajos}"
-                                th:if="${iter.index < 5}">
-                                <td>
-                                    <div class="fw-semibold"
-                                         th:text="${trabajo.titulo}"></div>
-                                    <div class="text-muted small"
-                                         th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto, 1, 2)}">
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge"
-                                          th:classappend="${trabajo.estado.name() == 'ABIERTO'} ? 'bg-success' :
-                                                          (${trabajo.estado.name() == 'EN_PROGRESO'} ? 'bg-warning text-dark' : 'bg-secondary')"
-                                          th:text="${trabajo.estado}">
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-primary rounded-pill"
-                                          th:text="${#lists.size(trabajo.postulaciones)}">
-                                    </span>
-                                </td>
-                                <td>
-                                    <a th:href="@{/trabajos/{id}(id=${trabajo.id})}"
-                                       class="btn btn-outline-primary btn-sm">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══════ DASHBOARD TRABAJADOR ═══════ -->
-        <div th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
-
-            <!-- Stats -->
-            <div class="row g-3 mb-4">
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-file-lines fa-2x text-primary mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="${#lists.size(misPostulaciones)}">0</div>
-                        <div class="text-muted small">Postulaciones</div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-handshake fa-2x text-success mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="${#lists.size(misContratos)}">0</div>
-                        <div class="text-muted small">Contratos</div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-wallet fa-2x text-warning mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="'Q' + ${billetera != null ? #numbers.formatDecimal(billetera.saldo, 1, 2) : '0.00'}">
-                        </div>
-                        <div class="text-muted small">Saldo disponible</div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-3">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <i class="fa-solid fa-bell fa-2x text-danger mb-2"></i>
-                        <div class="fw-bold fs-4"
-                             th:text="${notificacionesNoLeidas}">0</div>
-                        <div class="text-muted small">Notificaciones nuevas</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Acciones rápidas -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body p-4">
-                    <h6 class="fw-bold mb-3">Acciones rápidas</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a th:href="@{/trabajos}"
-                           class="btn btn-primary">
-                            <i class="fa-solid fa-magnifying-glass me-2"></i>
-                            Buscar trabajo
+        <p th:if="${#lists.isEmpty(misTrabajos)}">
+            Aún no has publicado trabajos.
+        </p>
+        <table th:unless="${#lists.isEmpty(misTrabajos)}" border="1" cellpadding="6">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Estado</th>
+                    <th>Presupuesto</th>
+                    <th>Postulantes</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="t : ${misTrabajos}">
+                    <td th:text="${t.titulo}"></td>
+                    <td th:text="${t.estado}"></td>
+                    <td th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}"></td>
+                    <td th:text="${#lists.size(t.postulaciones)}"></td>
+                    <td>
+                        <a th:href="@{/trabajos/{id}(id=${t.id})}">Ver</a>
+                        &nbsp;
+                        <a th:href="@{/trabajos/{id}/postulaciones(id=${t.id})}">
+                            Postulantes
                         </a>
-                        <a th:href="@{/mis-postulaciones}"
-                           class="btn btn-outline-primary">
-                            <i class="fa-solid fa-file-lines me-2"></i>
-                            Mis postulaciones
-                        </a>
-                        <a th:href="@{/contratos/mis-contratos}"
-                           class="btn btn-outline-secondary">
-                            <i class="fa-solid fa-handshake me-2"></i>
-                            Mis contratos
-                        </a>
-                        <a th:href="@{/billetera}"
-                           class="btn btn-outline-warning">
-                            <i class="fa-solid fa-wallet me-2"></i>
-                            Billetera
-                        </a>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-            <!-- Últimas postulaciones -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 pt-3 fw-bold
-                            d-flex justify-content-between">
-                    <span>
-                        <i class="fa-solid fa-file-lines me-2 text-primary"></i>
-                        Mis últimas postulaciones
-                    </span>
-                    <a th:href="@{/mis-postulaciones}"
-                       class="btn btn-outline-primary btn-sm">Ver todas</a>
-                </div>
-
-                <div class="card-body text-center py-4"
-                     th:if="${#lists.isEmpty(misPostulaciones)}">
-                    <p class="text-muted mb-2">
-                        Aún no te has postulado a ningún trabajo.
-                    </p>
-                    <a th:href="@{/trabajos}" class="btn btn-primary btn-sm">
-                        Buscar trabajo
-                    </a>
-                </div>
-
-                <div class="table-responsive"
-                     th:unless="${#lists.isEmpty(misPostulaciones)}">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Trabajo</th>
-                                <th>Presupuesto</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="post, iter : ${misPostulaciones}"
-                                th:if="${iter.index < 5}">
-                                <td class="fw-semibold"
-                                    th:text="${post.trabajo.titulo}"></td>
-                                <td class="text-primary fw-bold"
-                                    th:text="'Q' + ${#numbers.formatDecimal(post.trabajo.presupuesto, 1, 2)}">
-                                </td>
-                                <td>
-                                    <span class="badge"
-                                          th:classappend="${post.estado.name() == 'PENDIENTE'} ? 'bg-warning text-dark' :
-                                                          (${post.estado.name() == 'ACEPTADA'} ? 'bg-success' :
-                                                          (${post.estado.name() == 'RECHAZADA'} ? 'bg-danger' : 'bg-secondary'))"
-                                          th:text="${post.estado}">
-                                    </span>
-                                </td>
-                                <td>
-                                    <a th:href="@{/trabajos/{id}(id=${post.trabajo.id})}"
-                                       class="btn btn-outline-primary btn-sm">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══════ DASHBOARD ADMIN ═══════ -->
-        <div th:if="${usuarioActual.rol.name() == 'ADMIN'}">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4 text-center">
-                    <i class="fa-solid fa-gear fa-3x text-primary mb-3 d-block"></i>
-                    <h5 class="fw-bold">Panel de administración</h5>
-                    <p class="text-muted mb-3">
-                        Gestiona usuarios, verificaciones y reportes.
-                    </p>
-                    <a th:href="@{/admin}" class="btn btn-primary">
-                        <i class="fa-solid fa-arrow-right me-2"></i>
-                        Ir al panel admin
-                    </a>
-                </div>
-            </div>
-        </div>
-
+        <h3>Mis contratos</h3>
+        <p th:if="${#lists.isEmpty(misContratos)}">Sin contratos aún.</p>
+        <ul th:unless="${#lists.isEmpty(misContratos)}">
+            <li th:each="c : ${misContratos}">
+                <a th:href="@{/contratos/{id}(id=${c.id})}"
+                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}">
+                </a>
+            </li>
+        </ul>
     </div>
+
+    <!-- TRABAJADOR -->
+    <div th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
+        <h3>Mis postulaciones</h3>
+        <p><a th:href="@{/trabajos}">Buscar trabajos</a></p>
+
+        <p th:if="${#lists.isEmpty(misPostulaciones)}">
+            Aún no te has postulado a ningún trabajo.
+        </p>
+        <table th:unless="${#lists.isEmpty(misPostulaciones)}"
+               border="1" cellpadding="6">
+            <thead>
+                <tr>
+                    <th>Trabajo</th>
+                    <th>Presupuesto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="p : ${misPostulaciones}">
+                    <td th:text="${p.trabajo.titulo}"></td>
+                    <td th:text="'Q' + ${#numbers.formatDecimal(p.trabajo.presupuesto,1,2)}">
+                    </td>
+                    <td th:text="${p.estado}"></td>
+                    <td>
+                        <a th:href="@{/trabajos/{id}(id=${p.trabajo.id})}">Ver trabajo</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Mis contratos</h3>
+        <p th:if="${#lists.isEmpty(misContratos)}">Sin contratos aún.</p>
+        <ul th:unless="${#lists.isEmpty(misContratos)}">
+            <li th:each="c : ${misContratos}">
+                <a th:href="@{/contratos/{id}(id=${c.id})}"
+                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}">
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ADMIN -->
+    <div th:if="${usuarioActual.rol.name() == 'ADMIN'}">
+        <p><a th:href="@{/admin}">Ir al panel de administración</a></p>
+    </div>
+
 </section>
 </body>
 </html>

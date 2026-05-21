@@ -10,92 +10,60 @@
 </head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
 
-                        <h3 class="fw-bold mb-1"
-                            th:text="${trabajo != null} ? 'Editar trabajo' : 'Publicar trabajo'">
-                        </h3>
-                        <p class="text-muted small mb-4">
-                            Completa los datos del trabajo que deseas publicar.
-                        </p>
+    <h2 th:text="${trabajo != null} ? 'Editar trabajo' : 'Publicar trabajo'"></h2>
 
-                        <form th:action="${trabajo != null}
-                                        ? @{/trabajos/editar/{id}(id=${trabajo.id})}
-                                        : @{/trabajos/nuevo}"
-                              method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}"/>
+    <form th:action="${trabajo != null}
+                    ? @{/trabajos/editar/{id}(id=${trabajo.id})}
+                    : @{/trabajos/nuevo}"
+          method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Título del trabajo</label>
-                                <input type="text" name="titulo" class="form-control"
-                                       placeholder="Ej: Plomero para reparación urgente"
-                                       th:value="${trabajo?.titulo}" required maxlength="200"/>
-                            </div>
+        <p>
+            <label>Título:<br/>
+                <input type="text" name="titulo" size="50"
+                       th:value="${trabajo?.titulo}" required maxlength="200"/>
+            </label>
+        </p>
+        <p>
+            <label>Descripción:<br/>
+                <textarea name="descripcion" rows="6" cols="50"
+                          required th:text="${trabajo?.descripcion}"></textarea>
+            </label>
+        </p>
+        <p>
+            <label>Presupuesto (Q):<br/>
+                <input type="number" name="presupuesto" step="0.01" min="1"
+                       th:value="${trabajo?.presupuesto}" required/>
+            </label>
+        </p>
+        <p>
+            <label>Fecha límite (opcional):<br/>
+                <input type="date" name="fechaLimite"
+                       th:value="${trabajo?.fechaLimite}"/>
+            </label>
+        </p>
+        <p>
+            <label>Categoría:<br/>
+                <select name="categoriaId">
+                    <option value="">Sin categoría</option>
+                    <option th:each="cat : ${categorias}"
+                            th:value="${cat.id}"
+                            th:text="${cat.nombre}"
+                            th:selected="${trabajo?.categoria?.id == cat.id}">
+                    </option>
+                </select>
+            </label>
+        </p>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Descripción</label>
-                                <textarea name="descripcion" class="form-control" rows="5"
-                                          placeholder="Describe el trabajo en detalle: qué se necesita, dónde, condiciones especiales..."
-                                          required th:text="${trabajo?.descripcion}"></textarea>
-                            </div>
+        <button type="submit"
+                th:text="${trabajo != null} ? 'Guardar cambios' : 'Publicar trabajo'">
+        </button>
+        &nbsp;
+        <a th:href="@{/trabajos/mis-trabajos}">Cancelar</a>
+    </form>
 
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Presupuesto (Q)
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">Q</span>
-                                        <input type="number" name="presupuesto"
-                                               class="form-control" placeholder="0.00"
-                                               step="0.01" min="1"
-                                               th:value="${trabajo?.presupuesto}" required/>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Fecha límite
-                                        <span class="text-muted fw-normal">(opcional)</span>
-                                    </label>
-                                    <input type="date" name="fechaLimite" class="form-control"
-                                           th:value="${trabajo?.fechaLimite}"/>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold">Categoría</label>
-                                <select name="categoriaId" class="form-select">
-                                    <option value="">Sin categoría</option>
-                                    <option th:each="cat : ${categorias}"
-                                            th:value="${cat.id}"
-                                            th:text="${cat.nombre}"
-                                            th:selected="${trabajo?.categoria?.id == cat.id}">
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary fw-semibold">
-                                    <i class="fa-solid fa-floppy-disk me-2"></i>
-                                    <span th:text="${trabajo != null} ? 'Guardar cambios' : 'Publicar trabajo'">
-                                    </span>
-                                </button>
-                                <a th:href="@{/trabajos/mis-trabajos}"
-                                   class="btn btn-outline-secondary">
-                                    Cancelar
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </section>
 </body>
 </html>

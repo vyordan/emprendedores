@@ -3,104 +3,26 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
-<head><title>Admin — Dashboard</title></head>
+<head><title>Admin</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
 
-        <div class="mb-4">
-            <h2 class="fw-bold mb-0">Panel de administración</h2>
-            <p class="text-muted small mb-0">Resumen general del sistema</p>
-        </div>
+    <h2>Panel de administración</h2>
 
-        <!-- Stats -->
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6 col-lg-3">
-                <div class="card border-0 shadow-sm text-center p-4">
-                    <i class="fa-solid fa-users fa-2x text-primary mb-2"></i>
-                    <div class="fw-bold fs-3"
-                         th:text="${totalUsuarios}">0</div>
-                    <div class="text-muted small">Usuarios registrados</div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card border-0 shadow-sm text-center p-4">
-                    <i class="fa-solid fa-briefcase fa-2x text-success mb-2"></i>
-                    <div class="fw-bold fs-3"
-                         th:text="${totalTrabajos}">0</div>
-                    <div class="text-muted small">Trabajos abiertos</div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card border-0 shadow-sm text-center p-4">
-                    <i class="fa-solid fa-flag fa-2x text-danger mb-2"></i>
-                    <div class="fw-bold fs-3"
-                         th:text="${reportesPendientes}">0</div>
-                    <div class="text-muted small">Reportes pendientes</div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card border-0 shadow-sm text-center p-4">
-                    <i class="fa-solid fa-id-card fa-2x text-warning mb-2"></i>
-                    <div class="fw-bold fs-3"
-                         th:text="${verificacionesPendientes}">0</div>
-                    <div class="text-muted small">Verificaciones pendientes</div>
-                </div>
-            </div>
-        </div>
+    <p>Usuarios registrados: <strong th:text="${totalUsuarios}"></strong></p>
+    <p>Trabajos abiertos: <strong th:text="${totalTrabajos}"></strong></p>
+    <p>Reportes pendientes: <strong th:text="${reportesPendientes}"></strong></p>
+    <p>Verificaciones pendientes:
+        <strong th:text="${verificacionesPendientes}"></strong>
+    </p>
 
-        <!-- Navegación rápida -->
-        <div class="row g-3">
-            <div class="col-md-6 col-lg-3">
-                <a th:href="@{/admin/usuarios}"
-                   class="card border-0 shadow-sm text-decoration-none h-100">
-                    <div class="card-body p-4 text-center">
-                        <i class="fa-solid fa-users fa-2x text-primary mb-3 d-block"></i>
-                        <h6 class="fw-bold text-dark mb-1">Usuarios</h6>
-                        <p class="text-muted small mb-0">
-                            Gestionar cuentas y estados
-                        </p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <a th:href="@{/admin/verificaciones}"
-                   class="card border-0 shadow-sm text-decoration-none h-100">
-                    <div class="card-body p-4 text-center">
-                        <i class="fa-solid fa-id-card fa-2x text-warning mb-3 d-block"></i>
-                        <h6 class="fw-bold text-dark mb-1">Verificaciones</h6>
-                        <p class="text-muted small mb-0">
-                            Revisar documentos DPI
-                        </p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <a th:href="@{/admin/reportes}"
-                   class="card border-0 shadow-sm text-decoration-none h-100">
-                    <div class="card-body p-4 text-center">
-                        <i class="fa-solid fa-flag fa-2x text-danger mb-3 d-block"></i>
-                        <h6 class="fw-bold text-dark mb-1">Reportes</h6>
-                        <p class="text-muted small mb-0">
-                            Revisar reportes de usuarios
-                        </p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <a th:href="@{/admin/trabajos}"
-                   class="card border-0 shadow-sm text-decoration-none h-100">
-                    <div class="card-body p-4 text-center">
-                        <i class="fa-solid fa-briefcase fa-2x text-success mb-3 d-block"></i>
-                        <h6 class="fw-bold text-dark mb-1">Trabajos</h6>
-                        <p class="text-muted small mb-0">
-                            Ver trabajos publicados
-                        </p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
+    <ul>
+        <li><a th:href="@{/admin/usuarios}">Gestionar usuarios</a></li>
+        <li><a th:href="@{/admin/verificaciones}">Revisar verificaciones</a></li>
+        <li><a th:href="@{/admin/reportes}">Revisar reportes</a></li>
+        <li><a th:href="@{/admin/trabajos}">Ver trabajos</a></li>
+    </ul>
+
 </section>
 </body>
 </html>

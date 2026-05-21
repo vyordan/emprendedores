@@ -6,133 +6,49 @@
 <head><title>Buscar trabajo</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
 
-        <!-- Encabezado y buscador -->
-        <div class="row align-items-center mb-4">
-            <div class="col-md-6">
-                <h2 class="fw-bold mb-0">Trabajos disponibles</h2>
-                <p class="text-muted small mb-0"
-                   th:text="${#lists.size(trabajos)} + ' trabajos encontrados'"></p>
-            </div>
-            <div class="col-md-6 mt-3 mt-md-0">
-                <form th:action="@{/trabajos}" method="get" class="d-flex gap-2">
-                    <input type="text" name="q" class="form-control"
-                           placeholder="Buscar por título o descripción..."
-                           th:value="${q}"/>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
+    <h2>Trabajos disponibles</h2>
 
-        <div class="row g-4">
+    <form th:action="@{/trabajos}" method="get">
+        <input type="text" name="q" placeholder="Buscar..."
+               th:value="${q}"/>
+        <button type="submit">Buscar</button>
+    </form>
 
-            <!-- Sidebar categorías -->
-            <div class="col-md-3">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white fw-bold border-0 pt-3">
-                        <i class="fa-solid fa-filter me-2 text-primary"></i>Categorías
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <a th:href="@{/trabajos}"
-                           class="list-group-item list-group-item-action"
-                           th:classappend="${categoriaSeleccionada == null} ? 'active' : ''">
-                            <i class="fa-solid fa-th me-2"></i>Todas
-                        </a>
-                        <a th:each="cat : ${categorias}"
-                           th:href="@{/trabajos(categoria=${cat.id})}"
-                           th:text="${cat.nombre}"
-                           class="list-group-item list-group-item-action"
-                           th:classappend="${categoriaSeleccionada == cat.id} ? 'active' : ''">
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <p>Categorías:
+        <a th:href="@{/trabajos}">Todas</a>
+        <span th:each="cat : ${categorias}">
+            &nbsp;|&nbsp;
+            <a th:href="@{/trabajos(categoria=${cat.id})}"
+               th:text="${cat.nombre}"></a>
+        </span>
+    </p>
 
-            <!-- Lista de trabajos -->
-            <div class="col-md-9">
+    <hr/>
 
-                <!-- Sin resultados -->
-                <div class="text-center py-5" th:if="${#lists.isEmpty(trabajos)}">
-                    <i class="fa-solid fa-folder-open fa-3x text-muted mb-3 d-block"></i>
-                    <h5 class="text-muted">No se encontraron trabajos</h5>
-                    <p class="text-muted small">
-                        Intenta con otros términos o revisa más tarde.
-                    </p>
-                    <a th:href="@{/trabajos}" class="btn btn-outline-primary btn-sm">
-                        Ver todos los trabajos
-                    </a>
-                </div>
+    <p th:if="${#lists.isEmpty(trabajos)}">
+        No se encontraron trabajos.
+        <a th:href="@{/trabajos}">Ver todos</a>
+    </p>
 
-                <!-- Cards -->
-                <div class="row g-3" th:unless="${#lists.isEmpty(trabajos)}">
-                    <div class="col-12" th:each="trabajo : ${trabajos}">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <span class="badge bg-success me-2">Abierto</span>
-                                        <span class="badge bg-light text-dark"
-                                              th:if="${trabajo.categoria != null}"
-                                              th:text="${trabajo.categoria.nombre}"></span>
-                                    </div>
-                                    <span class="text-muted small"
-                                          th:text="${#temporals.format(trabajo.fechaCreacion, 'dd/MM/yyyy')}">
-                                    </span>
-                                </div>
-
-                                <h5 class="fw-bold mb-1"
-                                    th:text="${trabajo.titulo}">Título</h5>
-                                <p class="text-muted small mb-3"
-                                   th:text="${#strings.abbreviate(trabajo.descripcion, 150)}">
-                                </p>
-
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="fw-bold text-primary fs-5"
-                                              th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto, 1, 2)}">
-                                        </span>
-                                        <span class="text-muted small ms-2"
-                                              th:if="${trabajo.fechaLimite != null}"
-                                              th:text="'Hasta: ' + ${#temporals.format(trabajo.fechaLimite, 'dd/MM/yyyy')}">
-                                        </span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <span class="text-muted small">
-                                            <i class="fa-solid fa-users me-1"></i>
-                                            <span th:text="${#lists.size(trabajo.postulaciones)}">0</span>
-                                            postulantes
-                                        </span>
-                                        <a th:href="@{/trabajos/{id}(id=${trabajo.id})}"
-                                           class="btn btn-primary btn-sm">
-                                            Ver detalle
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Empleador -->
-                            <div class="card-footer bg-transparent border-top small text-muted
-                                        d-flex align-items-center gap-2">
-                                <img th:if="${trabajo.empleador.fotoPerfil != null}"
-                                     th:src="@{/imagenes/perfil/{id}(id=${trabajo.empleador.id})}"
-                                     class="rounded-circle" width="24" height="24"
-                                     style="object-fit:cover;" alt=""/>
-                                <i th:unless="${trabajo.empleador.fotoPerfil != null}"
-                                   class="fa-solid fa-circle-user"></i>
-                                <a th:href="@{/perfil/{id}(id=${trabajo.empleador.id})}"
-                                   class="text-muted text-decoration-none"
-                                   th:text="${trabajo.empleador.email}">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div th:each="trabajo : ${trabajos}">
+        <h3 th:text="${trabajo.titulo}"></h3>
+        <p th:text="${#strings.abbreviate(trabajo.descripcion, 150)}"></p>
+        <p>
+            Presupuesto:
+            <strong th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto,1,2)}">
+            </strong>
+            &nbsp;|&nbsp;
+            Estado: <span th:text="${trabajo.estado}"></span>
+            &nbsp;|&nbsp;
+            Postulantes: <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
+        </p>
+        <p th:if="${trabajo.categoria != null}"
+           th:text="'Categoría: ' + ${trabajo.categoria.nombre}"></p>
+        <a th:href="@{/trabajos/{id}(id=${trabajo.id})}">Ver detalle</a>
+        <hr/>
     </div>
+
 </section>
 </body>
 </html>

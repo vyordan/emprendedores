@@ -6,106 +6,44 @@
 <head><title>Mis contratos</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
 
-        <div class="mb-4">
-            <h2 class="fw-bold mb-0">Mis contratos</h2>
-            <p class="text-muted small mb-0">
-                Historial de todos tus contratos
-            </p>
-        </div>
+    <h2>Mis contratos</h2>
 
-        <!-- Sin contratos -->
-        <div class="text-center py-5 card border-0 shadow-sm"
-             th:if="${#lists.isEmpty(contratos)}">
-            <i class="fa-solid fa-handshake fa-3x text-muted mb-3 d-block"></i>
-            <h5 class="text-muted">Aún no tienes contratos</h5>
-            <p class="text-muted small">
-                Los contratos aparecen cuando un empleador acepta tu postulación
-                o cuando tú aceptas a un postulante.
-            </p>
-        </div>
+    <p th:if="${#lists.isEmpty(contratos)}">
+        Aún no tienes contratos.
+    </p>
 
-        <!-- Lista -->
-        <div class="row g-3" th:unless="${#lists.isEmpty(contratos)}">
-            <div class="col-12" th:each="contrato : ${contratos}">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="row align-items-center">
-
-                            <!-- Info -->
-                            <div class="col-md-5">
-                                <div class="d-flex align-items-start gap-3">
-                                    <div class="bg-primary bg-opacity-10 rounded p-2">
-                                        <i class="fa-solid fa-file-contract text-primary fa-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-bold mb-1"
-                                            th:text="${contrato.postulacion.trabajo.titulo}">
-                                        </h6>
-                                        <div class="text-muted small">
-                                            <i class="fa-solid fa-money-bill-wave me-1 text-success"></i>
-                                            <span th:text="'Q' + ${#numbers.formatDecimal(contrato.montoAcordado, 1, 2)}">
-                                            </span>
-                                        </div>
-                                        <div class="text-muted small">
-                                            <i class="fa-solid fa-calendar me-1"></i>
-                                            Iniciado:
-                                            <span th:text="${#temporals.format(contrato.fechaInicio, 'dd/MM/yyyy')}">
-                                            </span>
-                                        </div>
-                                        <div class="text-muted small"
-                                             th:if="${contrato.fechaFinEstimada != null}">
-                                            <i class="fa-solid fa-flag-checkered me-1"></i>
-                                            Estimado:
-                                            <span th:text="${#temporals.format(contrato.fechaFinEstimada, 'dd/MM/yyyy')}">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Partes -->
-                            <div class="col-md-4 mt-3 mt-md-0">
-                                <div class="small text-muted mb-1">
-                                    <i class="fa-solid fa-building-user me-1"></i>
-                                    <strong>Empleador:</strong>
-                                    <a th:href="@{/perfil/{id}(id=${contrato.postulacion.trabajo.empleador.id})}"
-                                       class="text-decoration-none"
-                                       th:text="${contrato.postulacion.trabajo.empleador.email}">
-                                    </a>
-                                </div>
-                                <div class="small text-muted">
-                                    <i class="fa-solid fa-person-digging me-1"></i>
-                                    <strong>Trabajador:</strong>
-                                    <a th:href="@{/perfil/{id}(id=${contrato.postulacion.trabajador.id})}"
-                                       class="text-decoration-none"
-                                       th:text="${contrato.postulacion.trabajador.email}">
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Estado y acciones -->
-                            <div class="col-md-3 mt-3 mt-md-0 text-md-end">
-                                <span class="badge fs-6 px-3 py-2 mb-2 d-inline-block"
-                                      th:classappend="${contrato.estado.name() == 'ACTIVO'} ? 'bg-success' :
-                                                      (${contrato.estado.name() == 'COMPLETADO'} ? 'bg-info' :
-                                                      (${contrato.estado.name() == 'DISPUTADO'} ? 'bg-warning text-dark' : 'bg-secondary'))"
-                                      th:text="${contrato.estado}">
-                                </span>
-                                <div>
-                                    <a th:href="@{/contratos/{id}(id=${contrato.id})}"
-                                       class="btn btn-primary btn-sm">
-                                        <i class="fa-solid fa-eye me-1"></i>Ver detalle
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div th:each="c : ${contratos}">
+        <h3 th:text="'Contrato #' + ${c.id}"></h3>
+        <p>
+            Trabajo: <strong th:text="${c.postulacion.trabajo.titulo}"></strong>
+            &nbsp;|&nbsp;
+            Estado: <strong th:text="${c.estado}"></strong>
+            &nbsp;|&nbsp;
+            Monto:
+            <span th:text="'Q' + ${#numbers.formatDecimal(c.montoAcordado,1,2)}">
+            </span>
+        </p>
+        <p>
+            Empleador:
+            <a th:href="@{/perfil/{id}(id=${c.postulacion.trabajo.empleador.id})}"
+               th:text="${c.postulacion.trabajo.empleador.email}"></a>
+            &nbsp;|&nbsp;
+            Trabajador:
+            <a th:href="@{/perfil/{id}(id=${c.postulacion.trabajador.id})}"
+               th:text="${c.postulacion.trabajador.email}"></a>
+        </p>
+        <p>
+            Inicio:
+            <span th:text="${#temporals.format(c.fechaInicio,'dd/MM/yyyy')}"></span>
+            <span th:if="${c.fechaFinEstimada != null}"
+                  th:text="'| Estimado: ' + ${#temporals.format(c.fechaFinEstimada,'dd/MM/yyyy')}">
+            </span>
+        </p>
+        <a th:href="@{/contratos/{id}(id=${c.id})}">Ver detalle</a>
+        <hr/>
     </div>
+
 </section>
 </body>
 </html>

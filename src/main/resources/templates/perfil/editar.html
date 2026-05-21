@@ -6,198 +6,125 @@
 <head><title>Editar perfil</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
 
-                <div class="mb-4">
-                    <h2 class="fw-bold mb-0">Editar perfil</h2>
-                    <p class="text-muted small mb-0">
-                        Actualiza tu información personal
-                    </p>
-                </div>
+    <h2>Editar perfil</h2>
 
-                <!-- Datos personales -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0 pt-3 fw-bold">
-                        <i class="fa-solid fa-user me-2 text-primary"></i>
-                        Información personal
-                    </div>
-                    <div class="card-body p-4">
-                        <form th:action="@{/perfil/editar}" method="post"
-                              enctype="multipart/form-data">
-                            <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}"/>
-
-                            <!-- Foto actual -->
-                            <div class="text-center mb-4">
-                                <img th:if="${usuarioActual.fotoPerfil != null}"
-                                     th:src="@{/imagenes/perfil/{id}(id=${usuarioActual.id})}"
-                                     class="rounded-circle border border-3 border-primary mb-2"
-                                     width="100" height="100"
-                                     style="object-fit:cover;" alt="Foto actual"/>
-                                <i th:unless="${usuarioActual.fotoPerfil != null}"
-                                   class="fa-solid fa-circle-user text-muted d-block mb-2"
-                                   style="font-size: 5rem;"></i>
-                                <div>
-                                    <label class="form-label small fw-semibold">
-                                        Cambiar foto de perfil
-                                    </label>
-                                    <input type="file" name="fotoPerfil"
-                                           class="form-control form-control-sm"
-                                           accept="image/*"/>
-                                </div>
-                            </div>
-
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Nombre</label>
-                                    <input type="text" name="nombre" class="form-control"
-                                           th:value="${perfil?.nombre}" required/>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Apellido</label>
-                                    <input type="text" name="apellido" class="form-control"
-                                           th:value="${perfil?.apellido}" required/>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Teléfono</label>
-                                <input type="tel" name="telefono" class="form-control"
-                                       th:value="${perfil?.telefono}"/>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Descripción</label>
-                                <textarea name="descripcion" class="form-control" rows="3"
-                                          placeholder="Cuéntanos sobre ti..."
-                                          th:text="${perfil?.descripcion}"></textarea>
-                            </div>
-
-                            <!-- Habilidades solo para trabajador -->
-                            <div class="mb-4"
-                                 th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
-                                <label class="form-label fw-semibold">Habilidades</label>
-                                <input type="text" name="habilidades" class="form-control"
-                                       th:value="${perfil?.habilidades}"
-                                       placeholder="Ej: Fontanería, pintura, electricidad..."/>
-                                <div class="form-text">
-                                    Separa las habilidades con comas.
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary fw-semibold">
-                                <i class="fa-solid fa-floppy-disk me-2"></i>
-                                Guardar cambios
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Cambiar contraseña -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0 pt-3 fw-bold">
-                        <i class="fa-solid fa-lock me-2 text-primary"></i>
-                        Cambiar contraseña
-                    </div>
-                    <div class="card-body p-4">
-                        <form th:action="@{/perfil/cambiar-password}" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}"/>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">
-                                    Contraseña actual
-                                </label>
-                                <input type="password" name="passwordActual"
-                                       class="form-control" required/>
-                            </div>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Nueva contraseña
-                                    </label>
-                                    <input type="password" name="passwordNueva"
-                                           class="form-control" minlength="8"
-                                           id="pwNueva" required/>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        Confirmar contraseña
-                                    </label>
-                                    <input type="password" name="confirmarPassword"
-                                           class="form-control" minlength="8"
-                                           id="pwConfirmar" required/>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-outline-primary fw-semibold">
-                                <i class="fa-solid fa-key me-2"></i>
-                                Actualizar contraseña
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Documentos trabajador -->
-                <div class="card border-0 shadow-sm"
-                     th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
-                    <div class="card-header bg-white border-0 pt-3 fw-bold">
-                        <i class="fa-solid fa-id-card me-2 text-primary"></i>
-                        Documentos de verificación
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="alert alert-info small mb-4">
-                            <i class="fa-solid fa-circle-info me-2"></i>
-                            Estado de verificación:
-                            <strong th:text="${perfil?.estadoVerificacion}"></strong>
-                        </div>
-                        <form th:action="@{/perfil/documentos}" method="post"
-                              enctype="multipart/form-data">
-                            <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}"/>
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        DPI — Frente
-                                    </label>
-                                    <input type="file" name="dpiFrente"
-                                           class="form-control" accept="image/*"/>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">
-                                        DPI — Reverso
-                                    </label>
-                                    <input type="file" name="dpiReverso"
-                                           class="form-control" accept="image/*"/>
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold">
-                                    Selfie de verificación
-                                </label>
-                                <input type="file" name="selfie"
-                                       class="form-control" accept="image/*"/>
-                                <div class="form-text">
-                                    Una foto tuya sosteniendo tu DPI.
-                                </div>
-                            </div>
-                            <button type="submit"
-                                    class="btn btn-outline-success fw-semibold">
-                                <i class="fa-solid fa-upload me-2"></i>
-                                Actualizar documentos
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    <!-- Foto actual -->
+    <div th:if="${usuarioActual.fotoPerfil != null}">
+        <img th:src="@{/imagenes/perfil/{id}(id=${usuarioActual.id})}"
+             width="80" height="80"
+             style="border-radius:50%; object-fit:cover;" alt="Foto actual"/>
     </div>
+
+    <!-- Datos personales -->
+    <h3>Información personal</h3>
+    <form th:action="@{/perfil/editar}" method="post"
+          enctype="multipart/form-data">
+        <input type="hidden" th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+
+        <p>
+            <label>Nombre:<br/>
+                <input type="text" name="nombre"
+                       th:value="${perfil?.nombre}" required/>
+            </label>
+        </p>
+        <p>
+            <label>Apellido:<br/>
+                <input type="text" name="apellido"
+                       th:value="${perfil?.apellido}" required/>
+            </label>
+        </p>
+        <p>
+            <label>Teléfono:<br/>
+                <input type="tel" name="telefono"
+                       th:value="${perfil?.telefono}"/>
+            </label>
+        </p>
+        <p>
+            <label>Descripción:<br/>
+                <textarea name="descripcion" rows="3" cols="40"
+                          th:text="${perfil?.descripcion}"></textarea>
+            </label>
+        </p>
+        <p th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
+            <label>Habilidades:<br/>
+                <input type="text" name="habilidades" size="40"
+                       th:value="${perfil?.habilidades}"
+                       placeholder="Separa con comas"/>
+            </label>
+        </p>
+        <p>
+            <label>Cambiar foto de perfil:<br/>
+                <input type="file" name="fotoPerfil" accept="image/*"/>
+            </label>
+        </p>
+        <button type="submit">Guardar cambios</button>
+    </form>
+
+    <hr/>
+
+    <!-- Cambiar contraseña -->
+    <h3>Cambiar contraseña</h3>
+    <form th:action="@{/perfil/cambiar-password}" method="post"
+          id="formPassword">
+        <input type="hidden" th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <p>
+            <label>Contraseña actual:<br/>
+                <input type="password" name="passwordActual" required/>
+            </label>
+        </p>
+        <p>
+            <label>Nueva contraseña:<br/>
+                <input type="password" name="passwordNueva"
+                       id="pwNueva" minlength="8" required/>
+            </label>
+        </p>
+        <p>
+            <label>Confirmar contraseña:<br/>
+                <input type="password" name="confirmarPassword"
+                       id="pwConfirmar" minlength="8" required/>
+            </label>
+        </p>
+        <button type="submit">Actualizar contraseña</button>
+    </form>
+
+    <!-- Documentos trabajador -->
+    <div th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
+        <hr/>
+        <h3>Documentos de verificación</h3>
+        <p>Estado actual:
+            <strong th:text="${perfil?.estadoVerificacion}"></strong>
+        </p>
+        <form th:action="@{/perfil/documentos}" method="post"
+              enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}"/>
+            <p>
+                <label>DPI — Frente:<br/>
+                    <input type="file" name="dpiFrente" accept="image/*"/>
+                </label>
+            </p>
+            <p>
+                <label>DPI — Reverso:<br/>
+                    <input type="file" name="dpiReverso" accept="image/*"/>
+                </label>
+            </p>
+            <p>
+                <label>Selfie de verificación:<br/>
+                    <input type="file" name="selfie" accept="image/*"/>
+                </label>
+            </p>
+            <button type="submit">Actualizar documentos</button>
+        </form>
+    </div>
+
 </section>
 
 <th:block layout:fragment="scripts">
 <script>
-    document.querySelector('form[action*="cambiar-password"]')
+    document.getElementById('formPassword')
         .addEventListener('submit', e => {
             const p1 = document.getElementById('pwNueva').value;
             const p2 = document.getElementById('pwConfirmar').value;

@@ -6,73 +6,40 @@
 <head><title>Admin — Trabajos</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
 
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div>
-                <h2 class="fw-bold mb-0">Trabajos abiertos</h2>
-                <p class="text-muted small mb-0">
-                    <span th:text="${#lists.size(trabajos)}"></span> trabajos activos
-                </p>
-            </div>
-        </div>
+    <a th:href="@{/admin}">← Admin</a>
+    <h2>Trabajos abiertos (<span th:text="${#lists.size(trabajos)}"></span>)</h2>
 
-        <div class="card border-0 shadow-sm">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Trabajo</th>
-                            <th>Empleador</th>
-                            <th>Categoría</th>
-                            <th>Presupuesto</th>
-                            <th>Postulantes</th>
-                            <th>Fecha</th>
-                            <th>Ver</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="trabajo : ${trabajos}">
-                            <td>
-                                <div class="fw-semibold"
-                                     th:text="${trabajo.titulo}"></div>
-                            </td>
-                            <td>
-                                <a th:href="@{/perfil/{id}(id=${trabajo.empleador.id})}"
-                                   class="text-decoration-none small"
-                                   th:text="${trabajo.empleador.email}"></a>
-                            </td>
-                            <td>
-                                <span th:if="${trabajo.categoria != null}"
-                                      th:text="${trabajo.categoria.nombre}"
-                                      class="badge bg-light text-dark"></span>
-                            </td>
-                            <td class="fw-bold text-primary"
-                                th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto, 1, 2)}">
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-primary rounded-pill"
-                                      th:text="${#lists.size(trabajo.postulaciones)}">
-                                </span>
-                            </td>
-                            <td class="text-muted small"
-                                th:text="${#temporals.format(trabajo.fechaCreacion, 'dd/MM/yyyy')}">
-                            </td>
-                            <td>
-                                <a th:href="@{/trabajos/{id}(id=${trabajo.id})}"
-                                   class="btn btn-outline-primary btn-sm">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Empleador</th>
+                <th>Categoría</th>
+                <th>Presupuesto</th>
+                <th>Postulantes</th>
+                <th>Fecha</th>
+                <th>Ver</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="t : ${trabajos}">
+                <td th:text="${t.titulo}"></td>
+                <td>
+                    <a th:href="@{/perfil/{id}(id=${t.empleador.id})}"
+                       th:text="${t.empleador.email}"></a>
+                </td>
+                <td th:text="${t.categoria?.nombre}"></td>
+                <td th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}"></td>
+                <td th:text="${#lists.size(t.postulaciones)}"></td>
+                <td th:text="${#temporals.format(t.fechaCreacion,'dd/MM/yyyy')}"></td>
+                <td>
+                    <a th:href="@{/trabajos/{id}(id=${t.id})}">Ver</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
 </section>
 </body>
 </html>

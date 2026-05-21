@@ -6,110 +6,64 @@
 <head><title>Admin — Usuarios</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
 
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div>
-                <h2 class="fw-bold mb-0">Usuarios</h2>
-                <p class="text-muted small mb-0">
-                    <span th:text="${#lists.size(usuarios)}"></span> usuarios registrados
-                </p>
-            </div>
-        </div>
+    <a th:href="@{/admin}">← Admin</a>
+    <h2>Usuarios (<span th:text="${#lists.size(usuarios)}"></span>)</h2>
 
-        <div class="card border-0 shadow-sm">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Email</th>
-                            <th>Rol</th>
-                            <th>Estado</th>
-                            <th>Registro</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="usuario : ${usuarios}">
-                            <td class="text-muted small"
-                                th:text="${usuario.id}"></td>
-                            <td>
-                                <a th:href="@{/perfil/{id}(id=${usuario.id})}"
-                                   class="text-decoration-none fw-semibold"
-                                   th:text="${usuario.email}"></a>
-                            </td>
-                            <td>
-                                <span class="badge"
-                                      th:classappend="${usuario.rol.name() == 'EMPLEADOR'} ? 'bg-primary' :
-                                                      (${usuario.rol.name() == 'TRABAJADOR'} ? 'bg-success' : 'bg-dark')"
-                                      th:text="${usuario.rol}">
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge"
-                                      th:classappend="${usuario.estado.name() == 'ACTIVO'} ? 'bg-success' :
-                                                      (${usuario.estado.name() == 'SUSPENDIDO'} ? 'bg-warning text-dark' : 'bg-danger')"
-                                      th:text="${usuario.estado}">
-                                </span>
-                            </td>
-                            <td class="text-muted small"
-                                th:text="${#temporals.format(usuario.fechaRegistro, 'dd/MM/yyyy')}">
-                            </td>
-                            <td>
-                                <div class="d-flex gap-1">
-                                    <!-- Suspender -->
-                                    <form th:if="${usuario.estado.name() == 'ACTIVO' and usuario.rol.name() != 'ADMIN'}"
-                                          th:action="@{/admin/usuarios/{id}/estado(id=${usuario.id})}"
-                                          method="post" class="d-inline">
-                                        <input type="hidden" th:name="${_csrf.parameterName}"
-                                               th:value="${_csrf.token}"/>
-                                        <input type="hidden" name="estado" value="SUSPENDIDO"/>
-                                        <button type="submit"
-                                                class="btn btn-warning btn-sm"
-                                                title="Suspender"
-                                                onclick="return confirm('¿Suspender este usuario?')">
-                                            <i class="fa-solid fa-pause"></i>
-                                        </button>
-                                    </form>
-                                    <!-- Activar -->
-                                    <form th:if="${usuario.estado.name() == 'SUSPENDIDO'}"
-                                          th:action="@{/admin/usuarios/{id}/estado(id=${usuario.id})}"
-                                          method="post" class="d-inline">
-                                        <input type="hidden" th:name="${_csrf.parameterName}"
-                                               th:value="${_csrf.token}"/>
-                                        <input type="hidden" name="estado" value="ACTIVO"/>
-                                        <button type="submit"
-                                                class="btn btn-success btn-sm"
-                                                title="Activar">
-                                            <i class="fa-solid fa-play"></i>
-                                        </button>
-                                    </form>
-                                    <!-- Banear -->
-                                    <form th:if="${usuario.estado.name() != 'BANEADO' and usuario.rol.name() != 'ADMIN'}"
-                                          th:action="@{/admin/usuarios/{id}/estado(id=${usuario.id})}"
-                                          method="post" class="d-inline">
-                                        <input type="hidden" th:name="${_csrf.parameterName}"
-                                               th:value="${_csrf.token}"/>
-                                        <input type="hidden" name="estado" value="BANEADO"/>
-                                        <button type="submit"
-                                                class="btn btn-danger btn-sm"
-                                                title="Banear"
-                                                onclick="return confirm('¿Banear permanentemente este usuario?')">
-                                            <i class="fa-solid fa-ban"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="u : ${usuarios}">
+                <td th:text="${u.id}"></td>
+                <td>
+                    <a th:href="@{/perfil/{id}(id=${u.id})}"
+                       th:text="${u.email}"></a>
+                </td>
+                <td th:text="${u.rol}"></td>
+                <td th:text="${u.estado}"></td>
+                <td th:text="${#temporals.format(u.fechaRegistro,'dd/MM/yyyy')}"></td>
+                <td>
+                    <form th:if="${u.estado.name() == 'ACTIVO' and u.rol.name() != 'ADMIN'}"
+                          th:action="@{/admin/usuarios/{id}/estado(id=${u.id})}"
+                          method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}"/>
+                        <input type="hidden" name="estado" value="SUSPENDIDO"/>
+                        <button type="submit">Suspender</button>
+                    </form>
+                    <form th:if="${u.estado.name() == 'SUSPENDIDO'}"
+                          th:action="@{/admin/usuarios/{id}/estado(id=${u.id})}"
+                          method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}"/>
+                        <input type="hidden" name="estado" value="ACTIVO"/>
+                        <button type="submit">Activar</button>
+                    </form>
+                    <form th:if="${u.estado.name() != 'BANEADO' and u.rol.name() != 'ADMIN'}"
+                          th:action="@{/admin/usuarios/{id}/estado(id=${u.id})}"
+                          method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}"/>
+                        <input type="hidden" name="estado" value="BANEADO"/>
+                        <button type="submit"
+                                onclick="return confirm('¿Banear permanentemente?')">
+                            Banear
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
 </section>
 </body>
 </html>

@@ -6,74 +6,42 @@
 <head><title>Iniciar sesión</title></head>
 <body>
 <section layout:fragment="contenido">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card shadow border-0">
-                    <div class="card-body p-4">
-                        <h3 class="fw-bold mb-1 text-center">Bienvenido</h3>
-                        <p class="text-muted text-center small mb-4">
-                            Inicia sesión en tu cuenta
-                        </p>
 
-                        <div class="alert alert-danger" th:if="${param.error}">
-                            <i class="fa-solid fa-circle-xmark me-2"></i>
-                            Email o contraseña incorrectos.
-                        </div>
-                        <div class="alert alert-success" th:if="${param.logout}">
-                            <i class="fa-solid fa-circle-check me-2"></i>
-                            Sesión cerrada exitosamente.
-                        </div>
-                        <div class="alert alert-warning" th:if="${param.expired}">
-                            Tu sesión ha expirado. Inicia sesión nuevamente.
-                        </div>
+    <h2>Iniciar sesión</h2>
 
-                        <form th:action="@{/auth/login}" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}"/>
+    <p style="color:red;" th:if="${param.error}">
+        Email o contraseña incorrectos.
+    </p>
+    <p style="color:green;" th:if="${param.logout}">
+        Sesión cerrada exitosamente.
+    </p>
+    <p style="color:orange;" th:if="${param.expired}">
+        Tu sesión ha expirado.
+    </p>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Correo electrónico</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fa-solid fa-envelope"></i>
-                                    </span>
-                                    <input type="email" name="username"
-                                           class="form-control" placeholder="tu@email.com"
-                                           required autofocus/>
-                                </div>
-                            </div>
+    <form th:action="@{/auth/login}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold">Contraseña</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fa-solid fa-lock"></i>
-                                    </span>
-                                    <input type="password" name="password"
-                                           class="form-control" placeholder="••••••••"
-                                           required/>
-                                </div>
-                            </div>
+        <p>
+            <label>Email:<br/>
+                <input type="email" name="username"
+                       placeholder="tu@email.com" required autofocus/>
+            </label>
+        </p>
+        <p>
+            <label>Contraseña:<br/>
+                <input type="password" name="password"
+                       placeholder="••••••••" required/>
+            </label>
+        </p>
+        <button type="submit">Iniciar sesión</button>
+    </form>
 
-                            <button type="submit" class="btn btn-primary w-100 fw-semibold">
-                                <i class="fa-solid fa-right-to-bracket me-2"></i>
-                                Iniciar sesión
-                            </button>
-                        </form>
+    <p>¿No tienes cuenta?
+        <a th:href="@{/auth/registro}">Regístrate aquí</a>
+    </p>
 
-                        <hr class="my-4"/>
-                        <p class="text-center mb-0 small">
-                            ¿No tienes cuenta?
-                            <a th:href="@{/auth/registro}" class="fw-semibold">
-                                Regístrate aquí
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </section>
 </body>
 </html>
