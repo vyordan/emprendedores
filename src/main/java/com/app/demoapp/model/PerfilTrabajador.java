@@ -40,7 +40,7 @@ public class PerfilTrabajador {
     private String habilidades;
 
     // Foto frontal del DPI
-    @Lob
+    
     @Column(columnDefinition = "bytea")
     private byte[] dpiFrente;
 
@@ -48,7 +48,7 @@ public class PerfilTrabajador {
     private String dpiFrenteTipo;
 
     // Foto reverso del DPI
-    @Lob
+    
     @Column(columnDefinition = "bytea")
     private byte[] dpiReverso;
 
@@ -56,7 +56,7 @@ public class PerfilTrabajador {
     private String dpiReversoTipo;
 
     // Selfie de verificación
-    @Lob
+    
     @Column(columnDefinition = "bytea")
     private byte[] selfieVerificacion;
 

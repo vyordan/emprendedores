@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ContratoService {
-
+    private final UsuarioRepository usuarioRepository;
     private final ContratoRepository contratoRepository;
     private final PostulacionRepository postulacionRepository;
     private final EscrowRepository escrowRepository;
@@ -127,24 +127,33 @@ public class ContratoService {
         billeteraTrabajador.setSaldo(billeteraTrabajador.getSaldo().add(pagoTrabajador));
         billeteraRepository.save(billeteraTrabajador);
 
-        // Registrar transacción de liberación
+        // Comisión va a la billetera del admin
+        Usuario admin = usuarioRepository.findByEmail("admin@chamba.gt")
+                .orElseThrow(() -> new ChambaException("Admin no encontrado."));
+        Billetera billeteraAdmin = billeteraRepository.findByUsuarioId(admin.getId())
+                .orElseThrow(() -> new ChambaException("Billetera admin no encontrada."));
+
+        billeteraAdmin.setSaldo(billeteraAdmin.getSaldo().add(comision));
+        billeteraRepository.save(billeteraAdmin);
+
+        // Transacción liberación al trabajador
         Transaccion txLibera = new Transaccion();
         txLibera.setBilleteraDestino(billeteraTrabajador);
         txLibera.setMonto(pagoTrabajador);
         txLibera.setTipo(TipoTransaccion.ESCROW_LIBERACION);
         txLibera.setEstado(EstadoTransaccion.COMPLETADA);
         txLibera.setContrato(contrato);
-        txLibera.setDescripcion("Pago liberado por contrato #" + contrato.getId());
+        txLibera.setDescripcion("Pago liberado contrato #" + contrato.getId());
         transaccionRepository.save(txLibera);
 
-        // Registrar comisión
+        // Transacción comisión a la plataforma
         Transaccion txComision = new Transaccion();
-        txComision.setBilletera(billeteraTrabajador);
+        txComision.setBilleteraDestino(billeteraAdmin);
         txComision.setMonto(comision);
         txComision.setTipo(TipoTransaccion.COMISION);
         txComision.setEstado(EstadoTransaccion.COMPLETADA);
         txComision.setContrato(contrato);
-        txComision.setDescripcion("Comisión plataforma (5%) contrato #" + contrato.getId());
+        txComision.setDescripcion("Comisión 10% contrato #" + contrato.getId());
         transaccionRepository.save(txComision);
 
         // Cerrar escrow y contrato
@@ -154,7 +163,6 @@ public class ContratoService {
         contrato.setEstado(EstadoContrato.COMPLETADO);
         contratoRepository.save(contrato);
 
-        // Cerrar trabajo
         Trabajo trabajo = contrato.getPostulacion().getTrabajo();
         trabajo.setEstado(EstadoTrabajo.COMPLETADO);
         trabajoRepository.save(trabajo);

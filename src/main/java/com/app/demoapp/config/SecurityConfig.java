@@ -40,49 +40,27 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                // Recursos estáticos — SIEMPRE primero
-                .requestMatchers(
-                    "/css/**",
-                    "/js/**",
-                    "/img/**",
-                    "/webjars/**",
-                    "/favicon.ico",
-                    "/error",
-                    "/error/**"
-                ).permitAll()
 
-                // Imágenes servidas desde controller
+                // Recursos estáticos
+                .requestMatchers("/css/**", "/js/**", "/img/**",
+                                 "/favicon.ico", "/error", "/error/**").permitAll()
+
+                // Imágenes
                 .requestMatchers("/imagenes/**").permitAll()
 
-                // Rutas públicas
-                .requestMatchers("/").permitAll()
+                // Auth
                 .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/trabajos").permitAll()
-                .requestMatchers("/trabajos/{id}").permitAll()
-                .requestMatchers("/perfil/{id}").permitAll()
 
-                // Solo admin
+                // Rutas públicas — trabajos y perfiles
+                .requestMatchers("/").permitAll()
+                .requestMatchers("/trabajos").permitAll()
+                .requestMatchers("/trabajos/**").permitAll()
+                .requestMatchers("/perfil/**").permitAll()
+
+                // Admin
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                // Solo empleador
-                .requestMatchers(
-                    "/trabajos/nuevo",
-                    "/trabajos/editar/**",
-                    "/trabajos/mis-trabajos",
-                    "/trabajos/*/estado",
-                    "/trabajos/*/postulaciones",
-                    "/postulaciones/*/rechazar",
-                    "/contratos/aceptar/**"
-                ).hasRole("EMPLEADOR")
-
-                // Solo trabajador
-                .requestMatchers(
-                    "/mis-postulaciones",
-                    "/trabajos/*/postular",
-                    "/postulaciones/*/retirar"
-                ).hasRole("TRABAJADOR")
-
-                // Cualquier usuario autenticado
+                // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
             )
 

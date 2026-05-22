@@ -61,10 +61,14 @@ public class AuthController {
 
             // Foto de perfil
             if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
-                usuarioService.actualizarFotoPerfil(
-                        usuario.getId(),
-                        fotoPerfil.getBytes(),
-                        fotoPerfil.getContentType());
+                try {
+                    usuarioService.actualizarFotoPerfil(
+                            usuario.getId(),
+                            fotoPerfil.getBytes(),
+                            fotoPerfil.getContentType());
+                } catch (Exception ignored) {
+                    // No bloquear el registro si la foto falla
+                }
             }
 
             if (rolEnum == Rol.EMPLEADOR) {
@@ -73,28 +77,35 @@ public class AuthController {
 
             } else if (rolEnum == Rol.TRABAJADOR) {
                 perfilService.crearPerfilTrabajador(
-                        usuario, nombre, apellido, dpi, telefono, descripcion, habilidades);
+                        usuario, nombre, apellido, dpi,
+                        telefono, descripcion, habilidades);
 
-                // Documentos de identidad
-                if (dpiFrente != null && !dpiFrente.isEmpty()
-                        && dpiReverso != null && !dpiReverso.isEmpty()
-                        && selfie != null && !selfie.isEmpty()) {
-                    perfilService.actualizarDocumentosTrabajador(
-                            usuario.getId(),
-                            dpiFrente.getBytes(), dpiFrente.getContentType(),
-                            dpiReverso.getBytes(), dpiReverso.getContentType(),
-                            selfie.getBytes(), selfie.getContentType());
+                // Documentos — opcionales, no bloquean el registro
+                try {
+                    if (dpiFrente != null && !dpiFrente.isEmpty()
+                            && dpiReverso != null && !dpiReverso.isEmpty()
+                            && selfie != null && !selfie.isEmpty()) {
+                        perfilService.actualizarDocumentosTrabajador(
+                                usuario.getId(),
+                                dpiFrente.getBytes(), dpiFrente.getContentType(),
+                                dpiReverso.getBytes(), dpiReverso.getContentType(),
+                                selfie.getBytes(), selfie.getContentType());
+                    }
+                } catch (Exception ignored) {
+                    // Si los documentos fallan, el trabajador puede subirlos después
                 }
             }
 
-            ra.addFlashAttribute("exito", "Cuenta creada exitosamente. Inicia sesión.");
+            ra.addFlashAttribute("exito",
+                    "Cuenta creada exitosamente. Inicia sesión.");
             return "redirect:/auth/login";
 
         } catch (ChambaException e) {
             ra.addFlashAttribute("error", e.getMessage());
             return "redirect:/auth/registro";
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "Ocurrió un error al registrar. Intenta de nuevo.");
+            ra.addFlashAttribute("error",
+                    "Ocurrió un error al registrar: " + e.getMessage());
             return "redirect:/auth/registro";
         }
     }
