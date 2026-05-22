@@ -22,11 +22,11 @@ public class Trabajo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empleador_id", nullable = false)
     private Usuario empleador;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
@@ -48,6 +48,7 @@ public class Trabajo {
     @Column(nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "trabajo", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "trabajo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Postulacion> postulaciones;
 }

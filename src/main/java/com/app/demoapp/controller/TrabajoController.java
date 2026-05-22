@@ -142,7 +142,7 @@ public class TrabajoController {
         } catch (ChambaException e) {
             ra.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/mis-trabajos";
+        return "redirect:/trabajos/mis-trabajos";
     }
 
     @GetMapping("/trabajos/{id}")
