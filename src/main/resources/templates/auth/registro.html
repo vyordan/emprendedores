@@ -3,91 +3,132 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Registro - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-registro" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <h2>Crear cuenta</h2>
+    <main style="display:flex; justify-content:center; align-items:center; flex:1; padding:40px 20px;">
+        <div class="tarjeta-formulario-horizontal-registro">
+            <a th:href="@{/}" class="btn-regresar-landing">⬅ Volver a la página principal</a>
+            <h2>Crear cuenta</h2>
+            <p class="subtitulo">Ingresa tus datos válidos para activar la cuenta</p>
 
-    <form th:action="@{/auth/registro}" method="post"
-          enctype="multipart/form-data" id="formRegistro">
-        <input type="hidden" th:name="${_csrf.parameterName}"
-               th:value="${_csrf.token}"/>
+            <!-- Foto de perfil (placeholder visual) -->
+            <div class="contenedor-foto-perfil">
+                <div class="circulo-foto" id="previsualizacion-foto">📸</div>
+                <label for="fotoPerfil" class="btn-subir-foto">Cargar Fotografía de Perfil <span style="color:#ff5252;">*</span></label>
+                <input type="file" id="fotoPerfil" name="fotoPerfil" accept="image/*" style="display:none;"
+                       onchange="cargarFoto(event)"/>
+            </div>
 
-        <p>
-            <strong>Tipo de cuenta:</strong><br/>
-            <label>
-                <input type="radio" name="rol" value="EMPLEADOR" required/>
-                Empleador (publico trabajos)
-            </label>
-            &nbsp;&nbsp;
-            <label>
-                <input type="radio" name="rol" value="TRABAJADOR"/>
-                Trabajador (busco trabajo)
-            </label>
-        </p>
-        <p><label>Nombre:<br/>
-            <input type="text" name="nombre" required/></label></p>
-        <p><label>Apellido:<br/>
-            <input type="text" name="apellido" required/></label></p>
-        <p><label>DPI:<br/>
-            <input type="text" name="dpi" maxlength="15" required/></label></p>
-        <p><label>Teléfono:<br/>
-            <input type="tel" name="telefono" maxlength="15" required/></label></p>
-        <p><label>Email:<br/>
-            <input type="email" name="email" required/></label></p>
-        <p><label>Contraseña:<br/>
-            <input type="password" name="password"
-                   id="password" minlength="8" required/></label></p>
-        <p><label>Confirmar contraseña:<br/>
-            <input type="password" name="confirmarPassword"
-                   id="confirmarPassword" minlength="8" required/></label></p>
-        <p><label>Descripción (opcional):<br/>
-            <textarea name="descripcion" rows="3"></textarea></label></p>
-        <p><label>Foto de perfil (opcional):<br/>
-            <input type="file" name="fotoPerfil" accept="image/*"/></label></p>
+            <form th:action="@{/auth/registro}" method="post" enctype="multipart/form-data" id="formRegistro">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-        <div id="camposTrabajador" style="display:none;">
-            <hr/>
-            <h3>Documentos de verificación</h3>
-            <p><label>Habilidades:<br/>
-                <input type="text" name="habilidades"
-                       placeholder="Ej: Fontanería, pintura..."/></label></p>
-            <p><label>DPI — Frente:<br/>
-                <input type="file" name="dpiFrente" accept="image/*"/></label></p>
-            <p><label>DPI — Reverso:<br/>
-                <input type="file" name="dpiReverso" accept="image/*"/></label></p>
-            <p><label>Selfie de verificación:<br/>
-                <input type="file" name="selfie" accept="image/*"/></label></p>
+                <!-- Tipo de cuenta -->
+                <div class="campo-entrada">
+                    <label>Tipo de cuenta <span style="color:#ff5252;">*</span></label>
+                    <div class="radio-grupo">
+                        <label class="radio-opcion">
+                            <input type="radio" name="rol" value="EMPLEADOR" required/>
+                            Empleador (publico trabajos)
+                        </label>
+                        <label class="radio-opcion">
+                            <input type="radio" name="rol" value="TRABAJADOR"/>
+                            Trabajador (busco trabajo)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="campo-entrada">
+                    <label>Nombre <span style="color:#ff5252;">*</span></label>
+                    <input type="text" name="nombre" required/>
+                </div>
+                <div class="campo-entrada">
+                    <label>Apellido <span style="color:#ff5252;">*</span></label>
+                    <input type="text" name="apellido" required/>
+                </div>
+                <div class="campo-entrada">
+                    <label>DPI <span style="color:#ff5252;">*</span></label>
+                    <input type="text" name="dpi" maxlength="15" required/>
+                </div>
+                <div class="campo-entrada">
+                    <label>Teléfono <span style="color:#ff5252;">*</span></label>
+                    <input type="tel" name="telefono" maxlength="15" required/>
+                </div>
+                <div class="campo-entrada">
+                    <label>Correo Electrónico <span style="color:#ff5252;">*</span></label>
+                    <input type="email" name="email" required/>
+                </div>
+                <div class="fila-campos">
+                    <div class="campo-entrada">
+                        <label>Contraseña <span style="color:#ff5252;">*</span></label>
+                        <input type="password" name="password" id="password" minlength="8" required/>
+                    </div>
+                    <div class="campo-entrada">
+                        <label>Confirmar contraseña <span style="color:#ff5252;">*</span></label>
+                        <input type="password" name="confirmarPassword" id="confirmarPassword" minlength="8" required/>
+                    </div>
+                </div>
+
+                <div class="campo-entrada">
+                    <label>Descripción (opcional)</label>
+                    <textarea name="descripcion" rows="3" placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                </div>
+
+                <!-- Campos exclusivos para trabajador -->
+                <div id="camposTrabajador" style="display:none;">
+                    <hr style="border-color:#232830; margin:20px 0;"/>
+                    <h3 style="color:#ffffff; margin-bottom:15px;">Documentos de verificación</h3>
+                    <div class="campo-entrada">
+                        <label>Habilidades</label>
+                        <input type="text" name="habilidades" placeholder="Ej: Fontanería, pintura..."/>
+                    </div>
+                    <div class="campo-entrada">
+                        <label>DPI — Frente</label>
+                        <input type="file" name="dpiFrente" accept="image/*"/>
+                    </div>
+                    <div class="campo-entrada">
+                        <label>DPI — Reverso</label>
+                        <input type="file" name="dpiReverso" accept="image/*"/>
+                    </div>
+                    <div class="campo-entrada">
+                        <label>Selfie de verificación</label>
+                        <input type="file" name="selfie" accept="image/*"/>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primario">CONSOLIDAR REGISTRO</button>
+            </form>
+
+            <p class="texto-cambio">
+                ¿Ya tienes cuenta? <a th:href="@{/auth/login}">Inicia sesión</a>
+            </p>
         </div>
+    </main>
 
-        <button type="submit">Crear cuenta</button>
-    </form>
-
-    <p>¿Ya tienes cuenta?
-        <a th:href="@{/auth/login}">Inicia sesión</a>
-    </p>
-</main>
-
-<footer><p>Chamba &copy; 2025</p></footer>
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
+</div>
 
 <script>
+    // Mostrar/ocultar campos de trabajador
     document.querySelectorAll('input[name="rol"]').forEach(r => {
         r.addEventListener('change', () => {
             document.getElementById('camposTrabajador').style.display =
                 r.value === 'TRABAJADOR' && r.checked ? 'block' : 'none';
         });
     });
+
+    // Validar contraseñas
     document.getElementById('formRegistro').addEventListener('submit', e => {
         const p1 = document.getElementById('password').value;
         const p2 = document.getElementById('confirmarPassword').value;
@@ -96,6 +137,16 @@
             alert('Las contraseñas no coinciden.');
         }
     });
+
+    // Previsualización de foto
+    function cargarFoto(event) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById('previsualizacion-foto').style.backgroundImage = `url('${reader.result}')`;
+            document.getElementById('previsualizacion-foto').innerText = '';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
 </script>
 </body>
 </html>

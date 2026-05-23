@@ -5,100 +5,108 @@
 <head>
     <meta charset="UTF-8"/>
     <title th:text="${trabajo.titulo} + ' - Chamba'">Detalle</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-detalle-trabajo" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <a th:href="@{/trabajos}">← Volver</a>
+    <main class="contenido-principal-interno centro-perfil-data">
+        <!-- Tarjeta principal del trabajo -->
+        <div class="dashboard-seccion" style="width:100%; text-align:left;">
+            <a th:href="@{/trabajos}" class="btn-atras">← Volver a la lista</a>
 
-    <h2 th:text="${trabajo.titulo}"></h2>
-    <p>Estado: <strong th:text="${trabajo.estado}"></strong></p>
+            <h2 th:text="${trabajo.titulo}" style="margin-top:15px;"></h2>
+            <span class="estado-badge" style="margin-bottom:15px;"
+                  th:classappend="'estado-' + ${trabajo.estado.name()}"
+                  th:text="${trabajo.estado}">Estado</span>
 
-    <p th:if="${trabajo.categoria != null}">
-        Categoría: <span th:text="${trabajo.categoria.nombre}"></span>
-    </p>
+            <div class="detalles-trabajo">
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Categoría:</span>
+                    <span th:if="${trabajo.categoria != null}" th:text="${trabajo.categoria.nombre}">Categoría</span>
+                    <span th:unless="${trabajo.categoria != null}">Sin categoría</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Presupuesto:</span>
+                    <strong th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto,1,2)}"></strong>
+                </div>
+                <div class="detalle-item" th:if="${trabajo.fechaLimite != null}">
+                    <span class="detalle-etiqueta">Fecha límite:</span>
+                    <span th:text="${#temporals.format(trabajo.fechaLimite,'dd/MM/yyyy')}"></span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Postulantes:</span>
+                    <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Publicado:</span>
+                    <span th:text="${#temporals.format(trabajo.fechaCreacion,'dd/MM/yyyy')}"></span>
+                </div>
+            </div>
 
-    <p>Presupuesto:
-        <strong th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto,1,2)}">
-        </strong>
-    </p>
-    <p th:if="${trabajo.fechaLimite != null}"
-       th:text="'Fecha límite: ' + ${#temporals.format(trabajo.fechaLimite,'dd/MM/yyyy')}">
-    </p>
-    <p>Postulantes:
-        <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
-    </p>
-    <p>Publicado:
-        <span th:text="${#temporals.format(trabajo.fechaCreacion,'dd/MM/yyyy')}"></span>
-    </p>
+            <h3>Descripción</h3>
+            <p class="descripcion-trabajo" th:text="${trabajo.descripcion}"></p>
 
-    <h3>Descripción</h3>
-    <p style="white-space:pre-line;" th:text="${trabajo.descripcion}"></p>
-
-    <h3>Publicado por</h3>
-    <p>
-        <a th:href="@{/perfil/{id}(id=${trabajo.empleador.id})}"
-           th:text="${trabajo.empleador.email}"></a>
-    </p>
-
-    <div th:if="${usuarioActual != null and
-                 trabajo.empleador.id == usuarioActual.id}">
-        <hr/>
-        <a th:href="@{/trabajos/editar/{id}(id=${trabajo.id})}">Editar</a>
-        &nbsp;
-        <a th:href="@{/trabajos/{id}/postulaciones(id=${trabajo.id})}">
-            Ver postulantes
-        </a>
-        &nbsp;
-        <form th:action="@{/trabajos/{id}/estado(id=${trabajo.id})}"
-              method="post" style="display:inline;">
-            <input type="hidden" th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}"/>
-            <input type="hidden" name="estado" value="CERRADO"/>
-            <button type="submit"
-                    onclick="return confirm('¿Cerrar este trabajo?')">
-                Cerrar trabajo
-            </button>
-        </form>
-    </div>
-
-    <div sec:authorize="hasRole('TRABAJADOR')">
-        <hr/>
-        <h3>Postularme</h3>
-        <p th:if="${yaPostulado}" style="color:green;">
-            Ya te postulaste a este trabajo.
-        </p>
-        <form th:unless="${yaPostulado}"
-              th:action="@{/trabajos/{id}/postular(id=${trabajo.id})}"
-              method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}"/>
+            <h3>Publicado por</h3>
             <p>
-                <label>Mensaje:<br/>
-                    <textarea name="mensaje" rows="4" cols="50"
-                              required></textarea>
-                </label>
+                <a th:href="@{/perfil/{id}(id=${trabajo.empleador.id})}" class="enlace-nav"
+                   th:text="${trabajo.empleador.email}"></a>
             </p>
-            <button type="submit">Enviar postulación</button>
-        </form>
-    </div>
+        </div>
 
-    <div sec:authorize="isAnonymous()">
-        <hr/>
-        <p><a th:href="@{/auth/login}">Inicia sesión</a> para postularte.</p>
-    </div>
-</main>
+        <!-- Acciones del empleador (dueño del trabajo) -->
+        <div th:if="${usuarioActual != null and trabajo.empleador.id == usuarioActual.id}"
+             class="dashboard-seccion" style="width:100%;">
+            <h3>Administrar trabajo</h3>
+            <div class="acciones-base">
+                <a th:href="@{/trabajos/editar/{id}(id=${trabajo.id})}" class="btn-ver-mas">Editar</a>
+                <a th:href="@{/trabajos/{id}/postulaciones(id=${trabajo.id})}" class="btn-ver-mas" style="background:#0288d1;">
+                    Ver postulantes
+                </a>
+                <form th:action="@{/trabajos/{id}/estado(id=${trabajo.id})}" method="post" style="display:inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="estado" value="CERRADO"/>
+                    <button type="submit" class="btn-logout"
+                            onclick="return confirm('¿Cerrar este trabajo?')">
+                        Cerrar trabajo
+                    </button>
+                </form>
+            </div>
+        </div>
 
-<footer><p>Chamba &copy; 2025</p></footer>
+        <!-- Sección para trabajadores: postularse -->
+        <div sec:authorize="hasRole('TRABAJADOR')" class="dashboard-seccion" style="width:100%;">
+            <h3>Postularme</h3>
+            <p th:if="${yaPostulado}" class="mensaje-flotante exito" style="position:static;">
+                Ya te postulaste a este trabajo.
+            </p>
+            <form th:unless="${yaPostulado}" th:action="@{/trabajos/{id}/postular(id=${trabajo.id})}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="campo-entrada">
+                    <label>Mensaje de presentación</label>
+                    <textarea name="mensaje" rows="4" required placeholder="Preséntate y explica por qué eres ideal para este trabajo..."></textarea>
+                </div>
+                <button type="submit" class="btn-primario">Enviar postulación ➔</button>
+            </form>
+        </div>
+
+        <!-- Usuario no autenticado -->
+        <div sec:authorize="isAnonymous()" class="dashboard-seccion" style="width:100%;">
+            <p><a th:href="@{/auth/login}" class="btn-nav-primario">Inicia sesión para postularte</a></p>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
+</div>
+
 </body>
 </html>

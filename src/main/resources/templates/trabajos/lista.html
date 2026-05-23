@@ -3,59 +3,62 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Buscar trabajo - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-lista-trabajos" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <h2>Trabajos disponibles</h2>
+    <main class="contenido-principal-interno">
+        <header class="barra-superior-interna">
+            <h1>Trabajos disponibles</h1>
+            <form th:action="@{/trabajos}" method="get" class="form-busqueda-hero" style="margin:0;">
+                <input type="text" name="q" placeholder="Buscar trabajos..." th:value="${q}"/>
+                <button type="submit" class="btn-hero">Buscar</button>
+            </form>
+        </header>
 
-    <form th:action="@{/trabajos}" method="get">
-        <input type="text" name="q" placeholder="Buscar..."
-               th:value="${q}"/>
-        <button type="submit">Buscar</button>
-    </form>
+        <!-- Filtro por categorías -->
+        <div class="filtro-categorias">
+            <a th:href="@{/trabajos}" class="btn-nav-outline" style="padding:6px 14px;">Todas</a>
+            <a th:each="cat : ${categorias}"
+               th:href="@{/trabajos(categoria=${cat.id})}"
+               th:text="${cat.nombre}"
+               class="enlace-nav" style="padding:6px 14px;"></a>
+        </div>
 
-    <p>
-        <a th:href="@{/trabajos}">Todas</a>
-        <span th:each="cat : ${categorias}">
-            &nbsp;|&nbsp;
-            <a th:href="@{/trabajos(categoria=${cat.id})}"
-               th:text="${cat.nombre}"></a>
-        </span>
-    </p>
-
-    <hr/>
-
-    <p th:if="${#lists.isEmpty(trabajos)}">No se encontraron trabajos.</p>
-
-    <div th:each="trabajo : ${trabajos}">
-        <h3 th:text="${trabajo.titulo}"></h3>
-        <p th:text="${#strings.abbreviate(trabajo.descripcion, 150)}"></p>
-        <p>
-            Presupuesto:
-            <strong th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto,1,2)}">
-            </strong>
-            &nbsp;|&nbsp;
-            Estado: <span th:text="${trabajo.estado}"></span>
-            &nbsp;|&nbsp;
-            Postulantes:
-            <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
+        <p th:if="${#lists.isEmpty(trabajos)}" class="mensaje-vacio">
+            No se encontraron trabajos con los filtros actuales.
         </p>
-        <a th:href="@{/trabajos/{id}(id=${trabajo.id})}">Ver detalle</a>
-        <hr/>
-    </div>
-</main>
 
-<footer><p>Chamba &copy; 2025</p></footer>
+        <div th:unless="${#lists.isEmpty(trabajos)}" class="lista-trabajadores-grid">
+            <div th:each="trabajo : ${trabajos}" class="tarjeta-trabajador">
+                <div class="info">
+                    <h4 th:text="${trabajo.titulo}">Título</h4>
+                    <p th:text="${#strings.abbreviate(trabajo.descripcion, 150)}">Descripción breve</p>
+                    <small>
+                        Presupuesto: <strong th:text="'Q' + ${#numbers.formatDecimal(trabajo.presupuesto,1,2)}"></strong>
+                        &nbsp;|&nbsp;
+                        Estado: <span th:text="${trabajo.estado}"></span>
+                        &nbsp;|&nbsp;
+                        Postulantes: <span th:text="${#lists.size(trabajo.postulaciones)}"></span>
+                    </small>
+                </div>
+                <a th:href="@{/trabajos/{id}(id=${trabajo.id})}" class="btn-ver-mas">Ver detalle</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
+</div>
+
 </body>
 </html>

@@ -3,121 +3,145 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Contrato - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-detalle-contrato" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <a th:href="@{/contratos/mis-contratos}">← Mis contratos</a>
+    <main class="contenido-principal-interno centro-perfil-data">
+        <!-- Encabezado con regreso -->
+        <a th:href="@{/contratos/mis-contratos}" class="btn-atras">← Mis contratos</a>
 
-    <h2>Contrato #<span th:text="${contrato.id}"></span></h2>
-    <p>Estado: <strong th:text="${contrato.estado}"></strong></p>
-    <p>Trabajo:
-        <strong th:text="${contrato.postulacion.trabajo.titulo}"></strong>
-    </p>
-    <p>Monto:
-        <strong th:text="'Q' + ${#numbers.formatDecimal(contrato.montoAcordado,1,2)}">
-        </strong>
-    </p>
-    <p>Inicio:
-        <span th:text="${#temporals.format(contrato.fechaInicio,'dd/MM/yyyy')}">
-        </span>
-    </p>
-    <p>
-        Empleador:
-        <a th:href="@{/perfil/{id}(id=${contrato.postulacion.trabajo.empleador.id})}"
-           th:text="${contrato.postulacion.trabajo.empleador.email}"></a>
-        &nbsp;|&nbsp;
-        Trabajador:
-        <a th:href="@{/perfil/{id}(id=${contrato.postulacion.trabajador.id})}"
-           th:text="${contrato.postulacion.trabajador.email}"></a>
-    </p>
+        <!-- Tarjeta principal del contrato -->
+        <div class="dashboard-seccion" style="width:100%; text-align:left; margin-top:15px;">
+            <h2>Contrato #<span th:text="${contrato.id}"></span></h2>
+            <span class="estado-badge" style="margin-bottom:15px;"
+                  th:classappend="'estado-' + ${contrato.estado.name()}"
+                  th:text="${contrato.estado}">Estado</span>
 
-    <div th:if="${contrato.escrow != null}">
-        <h3>Pago en custodia</h3>
-        <p>
-            Monto bloqueado:
-            <strong th:text="'Q' + ${#numbers.formatDecimal(contrato.escrow.montoBloquedo,1,2)}">
-            </strong>
-            &nbsp;|&nbsp;
-            Estado: <span th:text="${contrato.escrow.estado}"></span>
-        </p>
-    </div>
+            <div class="detalles-trabajo">
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Trabajo:</span>
+                    <strong th:text="${contrato.postulacion.trabajo.titulo}"></strong>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Monto acordado:</span>
+                    <strong th:text="'Q' + ${#numbers.formatDecimal(contrato.montoAcordado,1,2)}"></strong>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Inicio:</span>
+                    <span th:text="${#temporals.format(contrato.fechaInicio,'dd/MM/yyyy')}"></span>
+                </div>
+            </div>
 
-    <div th:if="${contrato.estado.name() == 'ACTIVO' and
-                 usuarioActual.id == contrato.postulacion.trabajo.empleador.id}">
-        <hr/>
-        <h3>Completar contrato</h3>
-        <form th:action="@{/contratos/{id}/completar(id=${contrato.id})}"
-              method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}"/>
-            <button type="submit"
-                    onclick="return confirm('¿Completar y liberar el pago?')">
-                Completar y liberar pago
-            </button>
-        </form>
-    </div>
+            <div class="detalles-trabajo">
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Empleador:</span>
+                    <a th:href="@{/perfil/{id}(id=${contrato.postulacion.trabajo.empleador.id})}"
+                       th:text="${contrato.postulacion.trabajo.empleador.email}" class="enlace-nav"></a>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-etiqueta">Trabajador:</span>
+                    <a th:href="@{/perfil/{id}(id=${contrato.postulacion.trabajador.id})}"
+                       th:text="${contrato.postulacion.trabajador.email}" class="enlace-nav"></a>
+                </div>
+            </div>
 
-    <div th:if="${contrato.estado.name() == 'COMPLETADO'}">
-        <hr/>
-        <h3>Dejar reseña</h3>
-        <form th:action="@{/resenas/contratos/{id}(id=${contrato.id})}"
-              method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}"/>
-            <p><label>Puntuación (1-5):<br/>
-                <input type="number" name="puntuacion" min="1" max="5" required/>
-            </label></p>
-            <p><label>Comentario:<br/>
-                <textarea name="comentario" rows="3" cols="40"></textarea>
-            </label></p>
-            <button type="submit">Enviar reseña</button>
-        </form>
-    </div>
+            <!-- Información del Escrow si existe -->
+            <div th:if="${contrato.escrow != null}" class="bloque-verificacion" style="margin-top:20px;">
+                <h3>Pago en custodia</h3>
+                <div class="detalles-trabajo" style="margin-bottom:0;">
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Monto bloqueado:</span>
+                        <strong th:text="'Q' + ${#numbers.formatDecimal(contrato.escrow.montoBloquedo,1,2)}"></strong>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Estado:</span>
+                        <span th:text="${contrato.escrow.estado}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <hr/>
-    <h3>Chat</h3>
-    <div style="border:1px solid #ccc; padding:10px; height:300px;
-                overflow-y:auto;" id="chatBox">
-        <p th:if="${#lists.isEmpty(mensajes)}" style="color:gray;">
-            Sin mensajes aún.
-        </p>
-        <div th:each="msg : ${mensajes}">
-            <p>
-                <strong th:text="${msg.remitente.email}"></strong>
-                <small th:text="'(' + ${#temporals.format(msg.fecha,'dd/MM HH:mm')} + ')'">
-                </small><br/>
-                <span th:text="${msg.contenido}"></span>
+        <!-- Acción: Completar contrato (solo empleador, contrato activo) -->
+        <div th:if="${contrato.estado.name() == 'ACTIVO' and usuarioActual.id == contrato.postulacion.trabajo.empleador.id}"
+             class="dashboard-seccion" style="width:100%;">
+            <h3>Completar contrato</h3>
+            <p style="color:#94a3b8; margin-bottom:15px;">Al completar el contrato se liberará el pago en custodia hacia el trabajador.</p>
+            <form th:action="@{/contratos/{id}/completar(id=${contrato.id})}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn-primario"
+                        onclick="return confirm('¿Completar y liberar el pago?')">
+                    Completar y liberar pago
+                </button>
+            </form>
+        </div>
+
+        <!-- Sección de reseña (contrato completado) -->
+        <div th:if="${contrato.estado.name() == 'COMPLETADO'}" class="dashboard-seccion" style="width:100%;">
+            <h3>Dejar resena</h3>
+            <form th:action="@{/resenas/contratos/{id}(id=${contrato.id})}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="campo-entrada">
+                    <label>Puntuacion (1-5)</label>
+                    <input type="number" name="puntuacion" min="1" max="5" required placeholder="5"/>
+                </div>
+                <div class="campo-entrada">
+                    <label>Comentario</label>
+                    <textarea name="comentario" rows="3" placeholder="Describe tu experiencia con el servicio recibido..."></textarea>
+                </div>
+                <button type="submit" class="btn-primario">Enviar resena</button>
+            </form>
+        </div>
+
+        <!-- Chat -->
+        <div class="dashboard-seccion" style="width:100%;">
+            <h3>Chat del contrato</h3>
+            <div class="contenido-chat-box" id="chatBox" style="max-height:350px; min-height:200px;">
+                <div class="historial-mensajes" id="historialMensajes">
+                    <p th:if="${#lists.isEmpty(mensajes)}" class="mensaje-vacio" style="padding:20px;">
+                        Sin mensajes aun. Inicia la conversacion.
+                    </p>
+                    <div th:each="msg : ${mensajes}" class="mensaje-chat"
+                         th:classappend="${msg.remitente.id == usuarioActual.id} ? 'msg-cliente' : 'msg-trabajador'">
+                        <div class="chat-meta" style="font-size:11px; opacity:0.7; margin-bottom:4px;">
+                            <strong th:text="${msg.remitente.email}"></strong>
+                            <small th:text="' - ' + ${#temporals.format(msg.fecha,'dd/MM HH:mm')}"></small>
+                        </div>
+                        <span th:text="${msg.contenido}" style="font-size:14px;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <form th:if="${contrato.estado.name() != 'CANCELADO'}"
+                  th:action="@{/chat/{id}/enviar(id=${contrato.id})}"
+                  method="post" id="formChat" class="barra-envio-chat" style="margin-top:15px;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="text" name="contenido" id="inputChat"
+                       placeholder="Escribe un mensaje..." required
+                       style="flex:1; padding:14px; background:#1a1e24; border:1px solid #2d3748; border-radius:8px; color:white;"/>
+                <button type="submit" style="padding:0 25px; background:#0288d1; border:none; color:white; border-radius:8px; font-weight:bold; cursor:pointer;">Enviar</button>
+            </form>
+            <p th:if="${contrato.estado.name() == 'CANCELADO'}" class="mensaje-vacio">
+                El chat esta cerrado porque el contrato fue cancelado.
             </p>
         </div>
-    </div>
+    </main>
 
-    <form th:if="${contrato.estado.name() != 'CANCELADO'}"
-          th:action="@{/chat/{id}/enviar(id=${contrato.id})}"
-          method="post" id="formChat">
-        <input type="hidden" th:name="${_csrf.parameterName}"
-               th:value="${_csrf.token}"/>
-        <textarea name="contenido" rows="2" cols="40"
-                  placeholder="Escribe un mensaje..."
-                  required id="inputChat"></textarea>
-        <button type="submit">Enviar</button>
-    </form>
-</main>
-
-<footer><p>Chamba &copy; 2025</p></footer>
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">NODUM &copy; 2026 - Todos los derechos reservados..</p>
+    </footer>
+</div>
 
 <script>
-    const chatBox = document.getElementById('chatBox');
+    const chatBox = document.getElementById('historialMensajes');
     if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
     const inputChat = document.getElementById('inputChat');
     if (inputChat) {

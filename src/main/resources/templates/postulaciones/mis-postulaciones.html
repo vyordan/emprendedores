@@ -3,57 +3,70 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Mis postulaciones - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-mis-postulaciones" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <h2>Mis postulaciones</h2>
-    <p><a th:href="@{/trabajos}">Buscar más trabajos</a></p>
+    <main class="contenido-principal-interno">
+        <header class="barra-superior-interna">
+            <h1>Mis postulaciones</h1>
+            <a th:href="@{/trabajos}" class="btn-nav-primario">Buscar más trabajos</a>
+        </header>
 
-    <p th:if="${#lists.isEmpty(postulaciones)}">Sin postulaciones aún.</p>
-
-    <div th:each="p : ${postulaciones}">
-        <h3 th:text="${p.trabajo.titulo}"></h3>
-        <p>
-            Estado: <strong th:text="${p.estado}"></strong> &nbsp;|&nbsp;
-            Presupuesto:
-            <span th:text="'Q' + ${#numbers.formatDecimal(p.trabajo.presupuesto,1,2)}">
-            </span> &nbsp;|&nbsp;
-            Fecha:
-            <span th:text="${#temporals.format(p.fechaPostulacion,'dd/MM/yyyy')}">
-            </span>
+        <p th:if="${#lists.isEmpty(postulaciones)}" class="mensaje-vacio">
+            Aún no te has postulado a ningún trabajo. ¡Explora las oportunidades disponibles!
         </p>
-        <p>
-            <a th:href="@{/trabajos/{id}(id=${p.trabajo.id})}">Ver trabajo</a>
-            &nbsp;
-            <a th:if="${p.contrato != null}"
-               th:href="@{/contratos/{id}(id=${p.contrato.id})}">
-                Ver contrato
-            </a>
-            &nbsp;
-            <form th:if="${p.estado.name() == 'PENDIENTE'}"
-                  th:action="@{/postulaciones/{id}/retirar(id=${p.id})}"
-                  method="post" style="display:inline;">
-                <input type="hidden" th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}"/>
-                <button type="submit"
-                        onclick="return confirm('¿Retirar?')">Retirar</button>
-            </form>
-        </p>
-        <hr/>
-    </div>
-</main>
 
-<footer><p>Chamba &copy; 2025</p></footer>
+        <!-- Lista de postulaciones -->
+        <div th:unless="${#lists.isEmpty(postulaciones)}" class="lista-postulaciones">
+            <div th:each="p : ${postulaciones}" class="tarjeta-postulacion">
+                <div class="encabezado-postulacion">
+                    <h3 th:text="${p.trabajo.titulo}">Título del trabajo</h3>
+                    <span class="estado-badge estado-postulacion"
+                          th:classappend="'estado-' + ${p.estado.name()} + ' ' + 'estado-badge'"
+                          th:text="${p.estado}">Estado</span>
+                </div>
+
+                <div class="detalles-postulacion">
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Presupuesto:</span>
+                        <span th:text="'Q' + ${#numbers.formatDecimal(p.trabajo.presupuesto,1,2)}">Q 0.00</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Fecha de postulación:</span>
+                        <span th:text="${#temporals.format(p.fechaPostulacion,'dd/MM/yyyy')}">01/01/2025</span>
+                    </div>
+                </div>
+
+                <div class="acciones-postulacion">
+                    <a th:href="@{/trabajos/{id}(id=${p.trabajo.id})}" class="btn-ver-mas">Ver trabajo</a>
+                    <a th:if="${p.contrato != null}" th:href="@{/contratos/{id}(id=${p.contrato.id})}" class="btn-ver-mas" style="background:#0288d1;">📄 Ver contrato</a>
+                    <form th:if="${p.estado.name() == 'PENDIENTE'}"
+                          th:action="@{/postulaciones/{id}/retirar(id=${p.id})}"
+                          method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <button type="submit" class="btn-logout" style="padding:8px 14px; font-size:13px;"
+                                onclick="return confirm('¿Estás seguro de retirar esta postulación?')">
+                            Retirar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
+</div>
+
 </body>
 </html>

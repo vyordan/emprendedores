@@ -3,109 +3,120 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Dashboard - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-home" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
+
+    <main class="contenido-principal-interno">
+        <!-- Encabezado limpio, solo bienvenida y rol -->
+        <header class="barra-superior-interna">
+            <h1 id="bienvenida-usuario">
+                Bienvenido,
+                <strong>
+                    <span th:if="${usuarioActual.perfilEmpleador != null}"
+                          th:text="${usuarioActual.perfilEmpleador.nombre}"></span>
+                    <span th:if="${usuarioActual.perfilTrabajador != null}"
+                          th:text="${usuarioActual.perfilTrabajador.nombre}"></span>
+                    <span th:if="${usuarioActual.perfilEmpleador == null and
+                                   usuarioActual.perfilTrabajador == null}"
+                          th:text="${usuarioActual.email}"></span>
+                </strong>
+                — <span th:text="${usuarioActual.rol}"></span>
+            </h1>
+        </header>
+
+        <!-- SECCIÓN EMPLEADOR -->
+        <div th:if="${usuarioActual.rol.name() == 'EMPLEADOR'}" class="dashboard-seccion">
+            <h3>Mis trabajos</h3>
+            <a th:href="@{/trabajos/nuevo}" class="btn-ver-mas" style="display:inline-block; margin-bottom:20px;">+ Publicar nuevo trabajo</a>
+
+            <p th:if="${#lists.isEmpty(misTrabajos)}" class="mensaje-vacio">Sin trabajos publicados.</p>
+
+            <div th:unless="${#lists.isEmpty(misTrabajos)}" class="tabla-contenedor">
+                <table class="tabla-estilizada">
+                    <thead>
+                        <tr>
+                            <th>Título</th><th>Estado</th><th>Presupuesto</th><th>Postulantes</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${misTrabajos}">
+                            <td th:text="${t.titulo}"></td>
+                            <td><span class="estado-badge" th:text="${t.estado}"></span></td>
+                            <td th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}"></td>
+                            <td th:text="${#lists.size(t.postulaciones)}"></td>
+                            <td class="acciones-celda">
+                                <a th:href="@{/trabajos/{id}(id=${t.id})}" class="btn-tabla">Ver</a>
+                                <a th:href="@{/trabajos/{id}/postulaciones(id=${t.id})}" class="btn-tabla">Postulantes</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Mis contratos</h3>
+            <p th:if="${#lists.isEmpty(misContratos)}" class="mensaje-vacio">Sin contratos aún.</p>
+            <ul class="lista-enlaces" th:unless="${#lists.isEmpty(misContratos)}">
+                <li th:each="c : ${misContratos}">
+                    <a th:href="@{/contratos/{id}(id=${c.id})}" th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}"></a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- SECCIÓN TRABAJADOR -->
+        <div th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}" class="dashboard-seccion">
+            <h3>Mis postulaciones</h3>
+            <a th:href="@{/trabajos}" class="btn-ver-mas" style="display:inline-block; margin-bottom:20px;">Buscar trabajos</a>
+
+            <p th:if="${#lists.isEmpty(misPostulaciones)}" class="mensaje-vacio">Sin postulaciones aún.</p>
+
+            <div th:unless="${#lists.isEmpty(misPostulaciones)}" class="tabla-contenedor">
+                <table class="tabla-estilizada">
+                    <thead>
+                        <tr>
+                            <th>Trabajo</th><th>Presupuesto</th><th>Estado</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${misPostulaciones}">
+                            <td th:text="${p.trabajo.titulo}"></td>
+                            <td th:text="'Q' + ${#numbers.formatDecimal(p.trabajo.presupuesto,1,2)}"></td>
+                            <td><span class="estado-badge" th:text="${p.estado}"></span></td>
+                            <td>
+                                <a th:href="@{/trabajos/{id}(id=${p.trabajo.id})}" class="btn-tabla">Ver trabajo</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Mis contratos</h3>
+            <p th:if="${#lists.isEmpty(misContratos)}" class="mensaje-vacio">Sin contratos aún.</p>
+            <ul class="lista-enlaces" th:unless="${#lists.isEmpty(misContratos)}">
+                <li th:each="c : ${misContratos}">
+                    <a th:href="@{/contratos/{id}(id=${c.id})}" th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}"></a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- SECCIÓN ADMIN -->
+        <div th:if="${usuarioActual.rol.name() == 'ADMIN'}" class="dashboard-seccion">
+            <p><a th:href="@{/admin}" class="btn-nav-primario">Ir al panel de administración</a></p>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
 </div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
 
-<main>
-    <h2>Dashboard</h2>
-    <p>Bienvenido,
-        <strong>
-            <span th:if="${usuarioActual.perfilEmpleador != null}"
-                  th:text="${usuarioActual.perfilEmpleador.nombre}"></span>
-            <span th:if="${usuarioActual.perfilTrabajador != null}"
-                  th:text="${usuarioActual.perfilTrabajador.nombre}"></span>
-            <span th:if="${usuarioActual.perfilEmpleador == null and
-                           usuarioActual.perfilTrabajador == null}"
-                  th:text="${usuarioActual.email}"></span>
-        </strong>
-        — Rol: <span th:text="${usuarioActual.rol}"></span>
-    </p>
-
-    <div th:if="${usuarioActual.rol.name() == 'EMPLEADOR'}">
-        <h3>Mis trabajos</h3>
-        <p><a th:href="@{/trabajos/nuevo}">+ Publicar nuevo trabajo</a></p>
-        <p th:if="${#lists.isEmpty(misTrabajos)}">Sin trabajos publicados.</p>
-        <table th:unless="${#lists.isEmpty(misTrabajos)}" border="1" cellpadding="6">
-            <thead><tr>
-                <th>Título</th><th>Estado</th>
-                <th>Presupuesto</th><th>Postulantes</th><th>Acciones</th>
-            </tr></thead>
-            <tbody>
-                <tr th:each="t : ${misTrabajos}">
-                    <td th:text="${t.titulo}"></td>
-                    <td th:text="${t.estado}"></td>
-                    <td th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}"></td>
-                    <td th:text="${#lists.size(t.postulaciones)}"></td>
-                    <td>
-                        <a th:href="@{/trabajos/{id}(id=${t.id})}">Ver</a>
-                        &nbsp;
-                        <a th:href="@{/trabajos/{id}/postulaciones(id=${t.id})}">
-                            Postulantes
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h3>Mis contratos</h3>
-        <p th:if="${#lists.isEmpty(misContratos)}">Sin contratos aún.</p>
-        <ul th:unless="${#lists.isEmpty(misContratos)}">
-            <li th:each="c : ${misContratos}">
-                <a th:href="@{/contratos/{id}(id=${c.id})}"
-                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}"></a>
-            </li>
-        </ul>
-    </div>
-
-    <div th:if="${usuarioActual.rol.name() == 'TRABAJADOR'}">
-        <h3>Mis postulaciones</h3>
-        <p><a th:href="@{/trabajos}">Buscar trabajos</a></p>
-        <p th:if="${#lists.isEmpty(misPostulaciones)}">Sin postulaciones aún.</p>
-        <table th:unless="${#lists.isEmpty(misPostulaciones)}"
-               border="1" cellpadding="6">
-            <thead><tr>
-                <th>Trabajo</th><th>Presupuesto</th>
-                <th>Estado</th><th>Acciones</th>
-            </tr></thead>
-            <tbody>
-                <tr th:each="p : ${misPostulaciones}">
-                    <td th:text="${p.trabajo.titulo}"></td>
-                    <td th:text="'Q' + ${#numbers.formatDecimal(p.trabajo.presupuesto,1,2)}"></td>
-                    <td th:text="${p.estado}"></td>
-                    <td>
-                        <a th:href="@{/trabajos/{id}(id=${p.trabajo.id})}">
-                            Ver trabajo
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h3>Mis contratos</h3>
-        <p th:if="${#lists.isEmpty(misContratos)}">Sin contratos aún.</p>
-        <ul th:unless="${#lists.isEmpty(misContratos)}">
-            <li th:each="c : ${misContratos}">
-                <a th:href="@{/contratos/{id}(id=${c.id})}"
-                   th:text="'Contrato #' + ${c.id} + ' — ' + ${c.estado}"></a>
-            </li>
-        </ul>
-    </div>
-
-    <div th:if="${usuarioActual.rol.name() == 'ADMIN'}">
-        <p><a th:href="@{/admin}">Ir al panel de administración</a></p>
-    </div>
-</main>
-
-<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>

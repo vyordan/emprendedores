@@ -3,43 +3,59 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Mis contratos - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-mis-contratos" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <h2>Mis contratos</h2>
-    <p th:if="${#lists.isEmpty(contratos)}">Sin contratos aún.</p>
+    <main class="contenido-principal-interno">
+        <header class="barra-superior-interna">
+            <h1>Mis contratos</h1>
+        </header>
 
-    <div th:each="c : ${contratos}">
-        <h3 th:text="'Contrato #' + ${c.id}"></h3>
-        <p>
-            Trabajo: <strong th:text="${c.postulacion.trabajo.titulo}"></strong>
-            &nbsp;|&nbsp;
-            Estado: <strong th:text="${c.estado}"></strong>
-            &nbsp;|&nbsp;
-            Monto:
-            <span th:text="'Q' + ${#numbers.formatDecimal(c.montoAcordado,1,2)}">
-            </span>
+        <p th:if="${#lists.isEmpty(contratos)}" class="mensaje-vacio">
+            Sin contratos aun. Cuando aceptes un trabajo o te postulen, apareceran aqui.
         </p>
-        <p>
-            Inicio:
-            <span th:text="${#temporals.format(c.fechaInicio,'dd/MM/yyyy')}"></span>
-        </p>
-        <a th:href="@{/contratos/{id}(id=${c.id})}">Ver detalle</a>
-        <hr/>
-    </div>
-</main>
 
-<footer><p>Chamba &copy; 2025</p></footer>
+        <div th:unless="${#lists.isEmpty(contratos)}" class="lista-postulaciones">
+            <div th:each="c : ${contratos}" class="tarjeta-postulacion">
+                <div class="encabezado-postulacion">
+                    <h3 th:text="'Contrato #' + ${c.id}">Contrato</h3>
+                    <span class="estado-badge" th:classappend="'estado-' + ${c.estado.name()}"
+                          th:text="${c.estado}">Estado</span>
+                </div>
+                <div class="detalles-postulacion">
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Trabajo:</span>
+                        <strong th:text="${c.postulacion.trabajo.titulo}"></strong>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Monto:</span>
+                        <span th:text="'Q' + ${#numbers.formatDecimal(c.montoAcordado,1,2)}">Q 0.00</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Inicio:</span>
+                        <span th:text="${#temporals.format(c.fechaInicio,'dd/MM/yyyy')}">01/01/2025</span>
+                    </div>
+                </div>
+                <div class="acciones-postulacion">
+                    <a th:href="@{/contratos/{id}(id=${c.id})}" class="btn-ver-mas">Ver detalle</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">NODUM &copy; 2026 - Todos los derechos reservados..</p>
+    </footer>
+</div>
+
 </body>
 </html>

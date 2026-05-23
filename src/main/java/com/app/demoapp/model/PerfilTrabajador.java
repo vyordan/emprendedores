@@ -17,7 +17,7 @@ public class PerfilTrabajador {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private Usuario usuario;
 

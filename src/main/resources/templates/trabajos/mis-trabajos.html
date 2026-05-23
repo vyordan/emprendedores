@@ -3,56 +3,64 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Mis trabajos - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-mis-trabajos" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <h2>Mis trabajos</h2>
-    <p><a th:href="@{/trabajos/nuevo}">+ Publicar nuevo</a></p>
+    <main class="contenido-principal-interno">
+        <header class="barra-superior-interna">
+            <h1>Mis trabajos</h1>
+            <a th:href="@{/trabajos/nuevo}" class="btn-nav-primario">+ Publicar nuevo</a>
+        </header>
 
-    <p th:if="${#lists.isEmpty(trabajos)}">Sin trabajos publicados.</p>
-
-    <div th:each="t : ${trabajos}">
-        <h3 th:text="${t.titulo}"></h3>
-        <p>
-            Estado: <strong th:text="${t.estado}"></strong> &nbsp;|&nbsp;
-            Presupuesto:
-            <strong th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}">
-            </strong> &nbsp;|&nbsp;
-            Postulantes:
-            <span th:text="${#lists.size(t.postulaciones)}"></span>
+        <p th:if="${#lists.isEmpty(trabajos)}" class="mensaje-vacio">
+            Aún no has publicado ningún trabajo. ¡Crea el primero!
         </p>
-        <p>
-            <a th:href="@{/trabajos/{id}(id=${t.id})}">Ver</a> &nbsp;
-            <a th:if="${t.estado.name() == 'ABIERTO'}"
-               th:href="@{/trabajos/editar/{id}(id=${t.id})}">Editar</a> &nbsp;
-            <a th:href="@{/trabajos/{id}/postulaciones(id=${t.id})}">
-                Postulantes
-            </a> &nbsp;
-            <form th:if="${t.estado.name() == 'ABIERTO'}"
-                  th:action="@{/trabajos/{id}/estado(id=${t.id})}"
-                  method="post" style="display:inline;">
-                <input type="hidden" th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}"/>
-                <input type="hidden" name="estado" value="CERRADO"/>
-                <button type="submit"
-                        onclick="return confirm('¿Cerrar?')">Cerrar</button>
-            </form>
-        </p>
-        <hr/>
-    </div>
-</main>
 
-<footer><p>Chamba &copy; 2025</p></footer>
+        <div th:unless="${#lists.isEmpty(trabajos)}" class="lista-postulaciones">
+            <div th:each="t : ${trabajos}" class="tarjeta-postulacion">
+                <div class="encabezado-postulacion">
+                    <h3 th:text="${t.titulo}">Título</h3>
+                    <span class="estado-badge" th:classappend="'estado-' + ${t.estado.name()}"
+                          th:text="${t.estado}">Estado</span>
+                </div>
+                <div class="detalles-postulacion">
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Presupuesto:</span>
+                        <span th:text="'Q' + ${#numbers.formatDecimal(t.presupuesto,1,2)}">Q 0.00</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-etiqueta">Postulantes:</span>
+                        <span th:text="${#lists.size(t.postulaciones)}"></span>
+                    </div>
+                </div>
+                <div class="acciones-postulacion">
+                    <a th:href="@{/trabajos/{id}(id=${t.id})}" class="btn-ver-mas">Ver</a>
+                    <a th:if="${t.estado.name() == 'ABIERTO'}" th:href="@{/trabajos/editar/{id}(id=${t.id})}" class="btn-ver-mas">Editar</a>
+                    <a th:href="@{/trabajos/{id}/postulaciones(id=${t.id})}" class="btn-ver-mas" style="background:#0288d1;">Postulantes</a>
+                    <form th:if="${t.estado.name() == 'ABIERTO'}" th:action="@{/trabajos/{id}/estado(id=${t.id})}" method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="estado" value="CERRADO"/>
+                        <button type="submit" class="btn-logout"
+                                onclick="return confirm('¿Cerrar este trabajo?')">Cerrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
+</div>
+
 </body>
 </html>

@@ -5,65 +5,76 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title th:text="${paginaTitulo != null} ? ${paginaTitulo} + ' - Chamba' : 'Chamba'">
-        Chamba
+    <title th:text="${paginaTitulo != null} ? ${paginaTitulo} + ' - NODUM' : 'NODUM'">
+        NODUM
     </title>
+    <!-- CSS global -->
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<nav th:fragment="navbar">
-    <a th:href="@{/}">Chamba</a>
-    &nbsp;|&nbsp;
-    <a th:href="@{/trabajos}">Buscar trabajo</a>
-
-    <span sec:authorize="isAnonymous()">
-        &nbsp;|&nbsp;
-        <a th:href="@{/auth/login}">Iniciar sesión</a>
-        &nbsp;|&nbsp;
-        <a th:href="@{/auth/registro}">Registrarse</a>
-    </span>
-
-    <span sec:authorize="isAuthenticated()">
-        &nbsp;|&nbsp;
-        <a th:href="@{/dashboard}">Dashboard</a>
-        &nbsp;|&nbsp;
-        <a th:href="@{/billetera}">Billetera
-            <span th:if="${billetera != null}"
-                  th:text="'(Q' + ${#numbers.formatDecimal(billetera.saldo,1,2)} + ')'">
-            </span>
+<!-- ========== NAVBAR ========== -->
+<nav th:fragment="navbar" class="barra-navegacion-principal">
+    <div class="logo-bloque">
+        <svg class="logo-svg" viewBox="0 0 500 500" width="38" height="38">
+            <path d="M150,150 L220,220 L150,290 L200,340 L300,240 L200,140 Z" fill="#2e7d32"/>
+            <path d="M350,150 L280,220 L350,290 L300,340 L200,240 L300,140 Z" fill="#2e7d32"/>
+            <circle cx="250" cy="110" r="25" fill="#e08f45"/>
+            <circle cx="250" cy="370" r="25" fill="#e08f45"/>
+        </svg>
+        <a th:href="@{/}" class="logo-texto-nav">
+            <h1>NODUM</h1>
+            <p>Trabajo seguro, beneficio de las personas que trabajan</p>
         </a>
-        &nbsp;|&nbsp;
-        <a th:href="@{/notificaciones}">Notificaciones
-            <span th:if="${notificacionesNoLeidas != null and notificacionesNoLeidas > 0}"
-                  th:text="'(' + ${notificacionesNoLeidas} + ')'">
+    </div>
+
+    <div class="enlaces-centrales">
+        <a th:href="@{/trabajos}" class="enlace-nav">🔍 Buscar trabajo</a>
+
+        <!-- Usuario NO autenticado -->
+        <span sec:authorize="isAnonymous()" class="grupo-enlaces">
+            <a th:href="@{/auth/login}" class="btn-nav-outline">Iniciar sesión</a>
+            <a th:href="@{/auth/registro}" class="btn-nav-primario">Registrarse</a>
+        </span>
+
+        <!-- Usuario autenticado -->
+        <span sec:authorize="isAuthenticated()" class="grupo-enlaces autenticado">
+            <a th:href="@{/dashboard}" class="enlace-nav">Dashboard</a>
+
+            <a th:href="@{/billetera}" class="enlace-nav billetera-nav">
+                Billetera
+                <span th:if="${billetera != null}" class="badge-saldo"
+                      th:text="'Q' + ${#numbers.formatDecimal(billetera.saldo,1,2)}">Q0.00</span>
+            </a>
+
+            <a th:href="@{/notificaciones}" class="enlace-nav notificaciones-nav">
+                Notificaciones
+                <span th:if="${notificacionesNoLeidas != null and notificacionesNoLeidas > 0}"
+                      class="badge-notificacion" th:text="${notificacionesNoLeidas}">0</span>
+            </a>
+
+            <a th:if="${usuarioActual != null}" th:href="@{/perfil/{id}(id=${usuarioActual.id})}"
+               class="enlace-nav perfil-nav">Mi perfil</a>
+
+            <span sec:authorize="hasRole('EMPLEADOR')" class="submenu-rol">
+                <a th:href="@{/trabajos/mis-trabajos}" class="enlace-nav">Mis trabajos</a>
+                <a th:href="@{/trabajos/nuevo}" class="enlace-nav">Publicar trabajo</a>
             </span>
-        </a>
-        &nbsp;|&nbsp;
-        <a th:if="${usuarioActual != null}"
-           th:href="@{/perfil/{id}(id=${usuarioActual.id})}">Mi perfil</a>
-        &nbsp;|&nbsp;
-        <span sec:authorize="hasRole('EMPLEADOR')">
-            <a th:href="@{/trabajos/mis-trabajos}">Mis trabajos</a>
-            &nbsp;|&nbsp;
-            <a th:href="@{/trabajos/nuevo}">Publicar trabajo</a>
-            &nbsp;|&nbsp;
+            <span sec:authorize="hasRole('TRABAJADOR')" class="submenu-rol">
+                <a th:href="@{/mis-postulaciones}" class="enlace-nav">Mis postulaciones</a>
+            </span>
+            <span sec:authorize="hasRole('ADMIN')" class="submenu-rol">
+                <a th:href="@{/admin}" class="enlace-nav admin-link">Admin</a>
+            </span>
+
+            <a th:href="@{/contratos/mis-contratos}" class="enlace-nav">Mis contratos</a>
+
+            <form th:action="@{/auth/logout}" method="post" class="form-logout">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn-logout">Cerrar sesión</button>
+            </form>
         </span>
-        <span sec:authorize="hasRole('TRABAJADOR')">
-            <a th:href="@{/mis-postulaciones}">Mis postulaciones</a>
-            &nbsp;|&nbsp;
-        </span>
-        <span sec:authorize="hasRole('ADMIN')">
-            <a th:href="@{/admin}">Admin</a>
-            &nbsp;|&nbsp;
-        </span>
-        <a th:href="@{/contratos/mis-contratos}">Mis contratos</a>
-        &nbsp;|&nbsp;
-        <form th:action="@{/auth/logout}" method="post" style="display:inline;">
-            <input type="hidden" th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}"/>
-            <button type="submit">Cerrar sesión</button>
-        </form>
-    </span>
+    </div>
 </nav>
 
 </body>

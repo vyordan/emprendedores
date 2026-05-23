@@ -3,69 +3,96 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Billetera - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-billetera" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
+
+    <main class="contenido-principal-interno centro-perfil-data">
+        <!-- Tarjeta de saldo principal -->
+        <div class="tarjeta-billetera-global">
+            <p>SALDO DISPONIBLE<br><br></p>
+            <h2 th:text="'Q' + ${#numbers.formatDecimal(billetera.saldo,1,2)}">Q 0.00</h2>
+            <p class="sub-billetera"><br>Fondos disponibles:<br></p>
+        </div>
+
+        <!-- Sección de depósito y retiro lado a lado -->
+        <div class="fila-campos" style="width:100%; gap:25px; margin-bottom:30px;">
+            <!-- Depósito -->
+            <div class="dashboard-seccion" style="flex:1; margin-bottom:0;">
+                <h3>Depositar fondos</h3>
+                <form th:action="@{/billetera/depositar}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <div class="campo-entrada">
+                        <label>Monto a depositar (Q)</label>
+                        <input type="number" name="monto" step="0.01" min="1" placeholder="0.00" required/>
+                    </div>
+                    <button type="submit" class="btn-primario">Depositar ➔</button>
+                </form>
+            </div>
+
+            <!-- Retiro -->
+            <div class="dashboard-seccion" style="flex:1; margin-bottom:0;">
+                <h3>Retirar fondos</h3>
+                <form th:action="@{/billetera/retirar}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <div class="campo-entrada">
+                        <label>Monto a retirar (Q)</label>
+                        <input type="number" name="monto" step="0.01" min="1"
+                               th:max="${billetera.saldo}" placeholder="0.00" required/>
+                    </div>
+                    <button type="submit" class="btn-primario" style="background:#b91c1c;">Retirar ➔</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Historial de transacciones -->
+        <div class="dashboard-seccion" style="width:100%;">
+            <h3>Historial de movimientos</h3>
+            <p th:if="${#lists.isEmpty(historial)}" class="mensaje-vacio">Sin movimientos aún. ¡Empieza a usar tu billetera!</p>
+
+            <div th:unless="${#lists.isEmpty(historial)}" class="tabla-contenedor">
+                <table class="tabla-estilizada">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tx : ${historial}">
+                            <td>
+                                <span class="estado-badge" th:classappend="${tx.tipo.toString() == 'DEPOSITO'} ? 'badge-deposito' : 'badge-retiro'"
+                                      th:text="${tx.tipo}">Tipo</span>
+                            </td>
+                            <td th:text="${tx.descripcion}">Descripción</td>
+                            <td>
+                                <strong th:class="${tx.tipo.toString() == 'DEPOSITO'} ? 'monto-positivo' : 'monto-negativo'"
+                                        th:text="'Q' + ${#numbers.formatDecimal(tx.monto,1,2)}">Q 0.00</strong>
+                            </td>
+                            <td><span class="estado-badge" th:text="${tx.estado}">Estado</span></td>
+                            <td th:text="${#temporals.format(tx.fecha,'dd/MM/yyyy HH:mm')}">01/01/2025</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
 </div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
 
-<main>
-    <h2>Mi billetera</h2>
-    <h3>Saldo:
-        <strong th:text="'Q' + ${#numbers.formatDecimal(billetera.saldo,1,2)}">
-        </strong>
-    </h3>
-
-    <h3>Depositar</h3>
-    <form th:action="@{/billetera/depositar}" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}"
-               th:value="${_csrf.token}"/>
-        <label>Monto (Q):
-            <input type="number" name="monto" step="0.01" min="1" required/>
-        </label>
-        <button type="submit">Depositar</button>
-    </form>
-
-    <h3>Retirar</h3>
-    <form th:action="@{/billetera/retirar}" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}"
-               th:value="${_csrf.token}"/>
-        <label>Monto (Q):
-            <input type="number" name="monto" step="0.01" min="1"
-                   th:max="${billetera.saldo}" required/>
-        </label>
-        <button type="submit">Retirar</button>
-    </form>
-
-    <hr/>
-    <h3>Historial</h3>
-    <p th:if="${#lists.isEmpty(historial)}">Sin movimientos.</p>
-    <table th:unless="${#lists.isEmpty(historial)}" border="1" cellpadding="6">
-        <thead>
-            <tr>
-                <th>Tipo</th><th>Descripción</th>
-                <th>Monto</th><th>Estado</th><th>Fecha</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="tx : ${historial}">
-                <td th:text="${tx.tipo}"></td>
-                <td th:text="${tx.descripcion}"></td>
-                <td th:text="'Q' + ${#numbers.formatDecimal(tx.monto,1,2)}"></td>
-                <td th:text="${tx.estado}"></td>
-                <td th:text="${#temporals.format(tx.fecha,'dd/MM/yyyy HH:mm')}"></td>
-            </tr>
-        </tbody>
-    </table>
-</main>
-
-<footer><p>xd &copy; 2026</p></footer>
 </body>
 </html>

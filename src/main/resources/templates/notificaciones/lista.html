@@ -3,27 +3,51 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Notificaciones - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-notificaciones" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<main>
-    <h2>Notificaciones</h2>
-    <p th:if="${#lists.isEmpty(notificaciones)}">Sin notificaciones.</p>
-    <div th:each="n : ${notificaciones}">
-        <p>
-            <span th:if="${!n.leida}">🔵 </span>
-            <span th:text="${n.mensaje}"></span> —
-            <small th:text="${#temporals.format(n.fecha,'dd/MM/yyyy HH:mm')}">
-            </small>
-            <a th:if="${n.url != null}" th:href="${n.url}">Ver</a>
+    <main class="contenido-principal-interno">
+        <header class="barra-superior-interna">
+            <h1>Notificaciones</h1>
+            <span th:if="${!notificaciones.isEmpty()}" class="badge-seguridad" style="font-size:13px; padding:6px 14px;">
+                <span th:text="${#lists.size(notificaciones)}"></span> notificaciones
+            </span>
+        </header>
+
+        <!-- Mensaje cuando no hay notificaciones -->
+        <p th:if="${#lists.isEmpty(notificaciones)}" class="mensaje-vacio">
+            Sin notificaciones por el momento. ¡Todo está al día!
         </p>
-        <hr/>
-    </div>
-</main>
 
-<footer><p>Chamba &copy; 2025</p></footer>
+        <!-- Lista de notificaciones -->
+        <div th:unless="${#lists.isEmpty(notificaciones)}" class="lista-notificaciones">
+            <div th:each="n : ${notificaciones}" class="tarjeta-notificacion" th:classappend="${!n.leida} ? 'no-leida' : 'leida'">
+                <div class="icono-notificacion">
+                    <span th:if="${!n.leida}">*</span>
+                    <!-- <span th:if="${n.leida}">✅</span> -->
+                </div>
+                <div class="contenido-notificacion">
+                    <p class="mensaje-notificacion" th:text="${n.mensaje}">Mensaje de la notificación</p>
+                    <small class="fecha-notificacion" th:text="${#temporals.format(n.fecha,'dd/MM/yyyy HH:mm')}">
+                        01/01/2025 12:00
+                    </small>
+                </div>
+                <a th:if="${n.url != null}" th:href="${n.url}" class="btn-ver-mas btn-accion-notificacion">
+                    Ver detalle →
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
+</div>
+
 </body>
 </html>

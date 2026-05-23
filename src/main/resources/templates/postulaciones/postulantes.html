@@ -3,74 +3,105 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Postulantes - Chamba</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
 
-<div th:replace="~{layout/base :: navbar}"></div>
-<hr/>
+<div id="pantalla-postulantes" class="contenedor-pantalla activa">
+    <!-- Navbar -->
+    <div th:replace="~{layout/base :: navbar}"></div>
 
-<div th:if="${exito != null}">
-    <p style="color:green;" th:text="${exito}"></p>
-</div>
-<div th:if="${error != null}">
-    <p style="color:red;" th:text="${error}"></p>
-</div>
+    <!-- Mensajes flotantes -->
+    <div th:if="${exito != null}" class="mensaje-flotante exito" th:text="${exito}"></div>
+    <div th:if="${error != null}" class="mensaje-flotante error" th:text="${error}"></div>
 
-<main>
-    <a th:href="@{/trabajos/{id}(id=${trabajo.id})}">← Volver</a>
-    <h2>Postulantes: <span th:text="${trabajo.titulo}"></span></h2>
-    <p><span th:text="${#lists.size(postulaciones)}"></span> postulante(s)</p>
-
-    <p th:if="${#lists.isEmpty(postulaciones)}">Nadie se ha postulado aún.</p>
-
-    <div th:each="p : ${postulaciones}">
-        <h3 th:text="${p.trabajador.email}"></h3>
-        <p>
-            Estado: <strong th:text="${p.estado}"></strong> &nbsp;|&nbsp;
-            Fecha:
-            <span th:text="${#temporals.format(p.fechaPostulacion,'dd/MM/yyyy')}">
+    <main class="contenido-principal-interno">
+        <header class="barra-superior-interna">
+            <div>
+                <a th:href="@{/trabajos/{id}(id=${trabajo.id})}" class="btn-atras">← Volver al trabajo</a>
+                <h1 style="margin-top:8px;">Postulantes: <span th:text="${trabajo.titulo}"></span></h1>
+            </div>
+            <span class="badge-seguridad" style="font-size:13px; padding:6px 14px;">
+                <span th:text="${#lists.size(postulaciones)}"></span> postulante(s)
             </span>
+        </header>
+
+        <p th:if="${#lists.isEmpty(postulaciones)}" class="mensaje-vacio">
+            Nadie se ha postulado aún. ¡Comparte el trabajo para atraer talento!
         </p>
-        <p th:if="${p.mensajePresentacion != null}"
-           th:text="'Mensaje: ' + ${p.mensajePresentacion}"></p>
-        <p><a th:href="@{/perfil/{id}(id=${p.trabajador.id})}">Ver perfil</a></p>
 
-        <div th:if="${p.estado.name() == 'PENDIENTE'}">
-            <form th:action="@{/contratos/aceptar/{id}(id=${p.id})}"
-                  method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}"/>
-                <label>Monto (Q):
-                    <input type="number" name="montoAcordado" step="0.01"
-                           th:value="${trabajo.presupuesto}" required/>
-                </label>
-                &nbsp;
-                <label>Fecha fin:
-                    <input type="date" name="fechaFinEstimada"/>
-                </label>
-                &nbsp;
-                <button type="submit"
-                        onclick="return confirm('¿Aceptar y crear contrato?')">
-                    Aceptar
-                </button>
-            </form>
+        <!-- Lista de postulantes -->
+        <div th:unless="${#lists.isEmpty(postulaciones)}" class="lista-postulantes">
+            <div th:each="p : ${postulaciones}" class="tarjeta-postulante">
+                <!-- Encabezado del postulante -->
+                <div class="encabezado-postulante">
+                        <div class="info-postulante">
+                        <h3 th:text="${p.trabajador.email}">email@correo.com</h3>
+                        <div class="detalles-postulacion">
+                            <span class="estado-badge" th:classappend="'estado-' + ${p.estado.name()}"
+                                  th:text="${p.estado}">Estado</span>
+                            <span class="fecha-postulacion">
+                                <span th:text="${#temporals.format(p.fechaPostulacion,'dd/MM/yyyy')}">01/01/2025</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-            <form th:action="@{/postulaciones/{id}/rechazar(id=${p.id})}"
-                  method="post" style="display:inline;">
-                <input type="hidden" th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}"/>
-                <button type="submit"
-                        onclick="return confirm('¿Rechazar?')">Rechazar</button>
-            </form>
+                <!-- Mensaje de presentación -->
+                <p th:if="${p.mensajePresentacion != null}" class="mensaje-presentacion"
+                   th:text="'' + ${p.mensajePresentacion}">Mensaje de presentación</p>
+
+                <!-- Acciones base -->
+                <div class="acciones-base">
+                    <a th:href="@{/perfil/{id}(id=${p.trabajador.id})}" class="btn-ver-mas">Ver perfil</a>
+                </div>
+
+                <!-- Acciones cuando está PENDIENTE -->
+                <div th:if="${p.estado.name() == 'PENDIENTE'}" class="acciones-decision">
+                    <hr style="border-color:#232830; margin:15px 0;"/>
+                    <form th:action="@{/contratos/aceptar/{id}(id=${p.id})}" method="post" class="form-aceptar">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <div class="fila-campos">
+                            <div class="campo-entrada">
+                                <label>Monto acordado (Q)</label>
+                                <input type="number" name="montoAcordado" step="0.01"
+                                       th:value="${trabajo.presupuesto}" required/>
+                            </div>
+                            <div class="campo-entrada">
+                                <label>Fecha fin estimada</label>
+                                <input type="date" name="fechaFinEstimada"/>
+                            </div>
+                        </div>
+                        <div class="botones-decision">
+                            <button type="submit" class="btn-primario" style="flex:1;"
+                                    onclick="return confirm('¿Aceptar postulante y crear contrato?')">
+                                Aceptar
+                            </button>
+                            <form th:action="@{/postulaciones/{id}/rechazar(id=${p.id})}" method="post" style="display:inline; flex:1;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <button type="submit" class="btn-primario" style="background:#b91c1c; width:100%;"
+                                        onclick="return confirm('¿Rechazar este postulante?')">
+                                    Rechazar
+                                </button>
+                            </form>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Contrato si ya fue aceptada -->
+                <div th:if="${p.estado.name() == 'ACEPTADA' and p.contrato != null}" class="acciones-base" style="margin-top:15px;">
+                    <a th:href="@{/contratos/{id}(id=${p.contrato.id})}" class="btn-ver-mas" style="background:#0288d1;">
+                        Ver contrato #<span th:text="${p.contrato.id}"></span>
+                    </a>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <div th:if="${p.estado.name() == 'ACEPTADA' and p.contrato != null}">
-            <a th:href="@{/contratos/{id}(id=${p.contrato.id})}">Ver contrato</a>
-        </div>
-        <hr/>
-    </div>
-</main>
+    <footer class="footer-bienvenida">
+        <p class="texto-copyright">Chamba © 2025 – Todos los derechos reservados.</p>
+    </footer>
+</div>
 
-<footer><p>Chamba &copy; 2025</p></footer>
 </body>
 </html>
