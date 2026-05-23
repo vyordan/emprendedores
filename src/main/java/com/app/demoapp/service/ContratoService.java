@@ -25,7 +25,7 @@ public class ContratoService {
     private final TrabajoRepository trabajoRepository;
 
     // Comisión de la plataforma: 5%
-    private static final BigDecimal COMISION = new BigDecimal("0.05");
+    private static final BigDecimal COMISION = new BigDecimal("0.10");
 
     public Optional<Contrato> findById(Long id) {
         return contratoRepository.findById(id);
